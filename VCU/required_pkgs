@@ -1,0 +1,10 @@
+# The following packages are required to be installed on the Raspberry Pi.
+# Be sure to enable the required interfaces in the Raspberry Pi Configuration Tool.
+
+
+# GPIO
+sudo apt-get install -y python-dev python-rpi.gpio
+
+# SPI/I2C
+sudo apt-get install -y python-smbus i2c-tools
+
