@@ -1,14 +1,16 @@
 class Car:
 
 	inQueue = False
+	intersectionTimeStamp = 0
+	accelerationX = 0			# X Acceleration in meters/(second per second)
+	accelerationY = 0			# Y Acceleration in meters/(second per second)
+
 
 	def __init__(self, length, width, velocityX, velocityY, startX, startY):
 		self.length = length; 			# Length in meters
 		self.width = width;				# Width in meters
 		self.velocityX = velocityX; 	# X Velocity in meters/second
 		self.velocityY = velocityY;		# Y Velocity in meters/second
-		self.accelerationX = 0			# X Acceleration in meters/(second per second)
-		self.accelerationY = 0			# Y Acceleration in meters/(second per second)
 		self.positionX = startX			# X start coordinate
 		self.positionY = startY			# Y start coordinate
 
@@ -32,8 +34,18 @@ class Car:
 	def displayAcceleration(self):
 		print "(", self.accelerationX, ", ", self.accelerationX, ")"
 
+
+	def updatePosition(self, time):
+		self.positionX = self.positionX + self.velocityX * time
+		self.positionY = self.positionY + self.velocityY * time
+	
+	# Calculate velocity
+	def updateVelocity(self, newPositionX, newPositionY):
+		self.velocityX = newPositionX - self.positionX
+		self.velocityY = newPositionY - self.positionY 
+
 	# Calculate acceleartion
-	def calculateAcceleration(self, newVelocityX, newVelocityY):
+	def updateAcceleration(self, newVelocityX, newVelocityY):
 		self.accelerationX = newVelocityX - self.velocityX
 		self.accelerationY = newVelocityY - self.velocityY
-
+		
