@@ -9,7 +9,7 @@ class Car:
 		self.positionX = startX			# X start coordinate
 		self.positionY = startY			# Y start coordinate
 
-	# Print details of car instance 
+	# Print all details of car instance 
 	def displayCar(self):
 		print "Length: ", self.length
 		print "Width: ", self.width
@@ -20,7 +20,11 @@ class Car:
 		print "X Acceleration: ", self.accelerationX
 		print "Y Acceleration: ", self.accelerationY
 
+	def displayPosition(self):
+		print "(", self.positionX, ", ", self.positionY, ")"
+
 	# Calculate acceleartion
 	def calculateAcceleration(self, newVelocityX, newVelocityY):
 		self.accelerationX = newVelocityX - self.velocityX
 		self.accelerationY = newVelocityY - self.velocityY
+
