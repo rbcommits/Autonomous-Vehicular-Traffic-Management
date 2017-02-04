@@ -1,4 +1,7 @@
 class Car:
+
+	inQueue = False
+
 	def __init__(self, length, width, velocityX, velocityY, startX, startY):
 		self.length = length; 			# Length in meters
 		self.width = width;				# Width in meters
@@ -22,6 +25,12 @@ class Car:
 
 	def displayPosition(self):
 		print "(", self.positionX, ", ", self.positionY, ")"
+
+	def displayVelocity(self):
+		print "(", self.velocityX, ", ", self.velocityY, ")"
+
+	def displayAcceleration(self):
+		print "(", self.accelerationX, ", ", self.accelerationX, ")"
 
 	# Calculate acceleartion
 	def calculateAcceleration(self, newVelocityX, newVelocityY):
