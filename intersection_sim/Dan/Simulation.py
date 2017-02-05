@@ -40,12 +40,7 @@ while(runSim):
 	# SECOND alert Calculations file cars that are in intersection
 	Calculations.collisionDetection(currIntersection.queueX, currIntersection.queueY)
 
-
-    for i in range(0, len(carList)):
-        # Third update position
-        carList[i].updatePosition(intervalTime)
-        # Print new position
-	    carList[i].displayPosition()
-
-
-
+	for i in range(0, len(carList)):
+		# THIRD update position
+		carList[i].updatePosition(intervalTime)
+		carList[i].displayPosition()
