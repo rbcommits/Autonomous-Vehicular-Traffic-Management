@@ -1,7 +1,6 @@
 import Queue
 from Car import Car
 class Intersection:
-	
 	queueX = Queue.Queue() 							# Initialize Queue to hold incoming X cars
 	queueY = Queue.Queue()							# Initialize Queue to hold incoming Y cars
 
@@ -12,7 +11,7 @@ class Intersection:
 		self.widthY = widthY
 		
 	def updateIntersectionQueues(self, carList, time):
-		for i in range(len(carList)):
+		for i in range(0, len(carList)):
 			# Check to see if car it within range of intersection to be regulated 
 			if(abs(carList[i].positionX) < 5 and carList[i].velocityY == 0): 
 				print("X Lane: CAR MUST BE REGULATED")

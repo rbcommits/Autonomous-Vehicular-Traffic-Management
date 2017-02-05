@@ -18,10 +18,8 @@ carList = []											# initialize car array
 carList.append(car1)									# place car in array
 carList.append(car2)									# place car in array
 
-for i in range(len(carList)):
+for i in range(0, len(carList)):
 	carList[i].displayCar() 
-
-
 
 
 elapsedTime = 0											# initialize time in seconds
@@ -39,18 +37,15 @@ while(runSim):
 
 	# FIRST check if car is in the intersection
 	currIntersection.updateIntersectionQueues(carList, elapsedTime)
-	# SECOND alert Calculations file cars that are in intersection 
+	# SECOND alert Calculations file cars that are in intersection
 	Calculations.collisionDetection(currIntersection.queueX, currIntersection.queueY)
-	# Third update position
-	carList[i].updatePosition(intervalTime)
 
 
-
-
-
-
-	# Print new position
-	carList[i].displayPosition()
+    for i in range(0, len(carList)):
+        # Third update position
+        carList[i].updatePosition(intervalTime)
+        # Print new position
+	    carList[i].displayPosition()
 
 
 

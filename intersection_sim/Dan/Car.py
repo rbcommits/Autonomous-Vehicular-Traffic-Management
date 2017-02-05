@@ -7,14 +7,14 @@ class Car:
 
 
 	def __init__(self, length, width, velocityX, velocityY, startX, startY):
-		self.length = length; 			# Length in meters
-		self.width = width;				# Width in meters
-		self.velocityX = velocityX; 	# X Velocity in meters/second
-		self.velocityY = velocityY;		# Y Velocity in meters/second
+		self.length = length 			# Length in meters
+		self.width = width  			# Width in meters
+		self.velocityX = velocityX  	# X Velocity in meters/second
+		self.velocityY = velocityY 		# Y Velocity in meters/second
 		self.positionX = startX			# X start coordinate
 		self.positionY = startY			# Y start coordinate
 
-	# Print all details of car instance 
+	# Print all details of car instance
 	def displayCar(self):
 		print "Length: ", self.length
 		print "Width: ", self.width
@@ -42,7 +42,7 @@ class Car:
 	# Calculate velocity
 	def updateVelocity(self, newPositionX, newPositionY):
 		self.velocityX = newPositionX - self.positionX
-		self.velocityY = newPositionY - self.positionY 
+		self.velocityY = newPositionY - self.positionY
 
 	# Calculate acceleartion
 	def updateAcceleration(self, newVelocityX, newVelocityY):
