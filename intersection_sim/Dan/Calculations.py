@@ -22,6 +22,7 @@ def collisionDetection(queueX, queueY):
     else:
         print "No cars in range of intersection"
 
+
 def slowCar(car):
 
     print car.displayCar()
