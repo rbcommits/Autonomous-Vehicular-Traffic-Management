@@ -24,14 +24,14 @@ for i in range(0, len(carList)):
 
 
 elapsedTime = 0                                         # initialize time in seconds
-intervalTime = 1.1
+intervalTime = .5
 runSim = True                                           # bool to stop simulation
 
 # Begin simulation:
 while(runSim):
 
     # Check to see if we should end simulation
-    if(elapsedTime > 50):
+    if(elapsedTime > 10):
         runSim = False                                  # if time condition is true runSim to false
     elapsedTime += intervalTime                         # increment 100 mili second
 
