@@ -18,6 +18,9 @@ carList = []											# initialize car array
 carList.append(car1)									# place car in array
 carList.append(car2)									# place car in array
 
+
+
+
 for i in range(0, len(carList)):
 	carList[i].displayCar() 
 
@@ -28,6 +31,7 @@ runSim = True 											# bool to stop simulation
 
 # Begin simulation:
 while(runSim):
+
 
 	# Check to see if we should end simulation
 	if(elapsedTime > 50):
