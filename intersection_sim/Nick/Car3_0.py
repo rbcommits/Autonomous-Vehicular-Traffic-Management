@@ -173,7 +173,7 @@ while(c2.gp()>=-1):
     print ('for time',time)
 
     #if car 2 will not be out of the intersection before car 1 is 1/2 a foot in front of it
-    if(v1*(t2-td)>1):
+    if(v1*(t2-td)>4):
         #decelorate
 
         c1.sv(v1-(deltat))
@@ -186,9 +186,10 @@ while(c2.gp()>=-1):
 
         c2.st()
         #if you dont need to accelorate yet
-    elif(v1*(t2-td)<=1 and to2>td+(deltat)):
+    elif(v1*(t2-td)<=4 and to2>td+(deltat)):
 
         #maintain speed
+        c1.sv(v1)
 
         #and update the time to intersection
 
