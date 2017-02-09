@@ -41,6 +41,7 @@ class carGUI:
 
     def drawCar(self, lane, ID):
 
+        self.master.update_idletasks()  # THIS UPDATES THE GUI
         if(lane == 1):
             self.rect = self.canv.create_rectangle(0, 480, 10, 490, fill='yellow')
         elif(lane == 2):

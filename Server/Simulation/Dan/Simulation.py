@@ -5,6 +5,10 @@ from Car import Car
 from Intersection import Intersection
 
 
+# Initialize array to contain cars
+carList = []
+
+
 def randomCarGenerator(LiveGUI):
     direction = randint(1, 2)
 
@@ -31,18 +35,16 @@ def randomCarGenerator(LiveGUI):
     return car
 
 
-def cleanList(carList):
+def cleanList(carList, LiveGUI):
     for i in range(len(carList), 0):
         if(carList[i].positionX > 5 or carList[i].positionY > 5):
+            del LiveGUI.carDict[carList[i].ID]
             del carList[i]
 
 
 def simulation(gui):
     # Initialize instance of intersection
     currIntersection = Intersection(100, 100, 10, 10)
-
-    # Initialize array to contain car
-    carList = []
 
     for i in range(0, len(carList)):
         carList[i].displayCar()
@@ -55,7 +57,7 @@ def simulation(gui):
     while(runSim):
 
         # Remove processed cars from the intersection list
-        cleanList(carList)
+        cleanList(carList, gui)
 
         # Check to see if we should end simulation
         if(elapsedTime > 1000):
@@ -77,6 +79,7 @@ def simulation(gui):
         gui.moveCars(carList)
 
         # Every seconds generate a new car
+        print "Module is:  ", elapsedTime % 1
         if(elapsedTime % 1 is 0):
             # Generate a new car
             newCar = randomCarGenerator(gui)
@@ -85,6 +88,3 @@ def simulation(gui):
         # If a car has exited the intersection remove it from the array
 
     print len(carList)
-
-
-
