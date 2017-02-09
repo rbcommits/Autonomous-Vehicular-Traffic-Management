@@ -5,13 +5,14 @@ class Car:
     accelerationX = 0           # X Acceleration in meters/(second per second)
     accelerationY = 0           # Y Acceleration in meters/(second per second)
 
-    def __init__(self, length, width, velocityX, velocityY, startX, startY):
+    def __init__(self, length, width, velocityX, velocityY, startX, startY, ID):
         self.length = length            # Length in meters
         self.width = width              # Width in meters
         self.velocityX = velocityX      # X Velocity in meters/second
         self.velocityY = velocityY      # Y Velocity in meters/second
         self.positionX = startX         # X start coordinate
         self.positionY = startY         # Y start coordinate
+        self.ID = ID                    # Give car unique ID
 
     # Print all details of car instance
     def displayCar(self):
