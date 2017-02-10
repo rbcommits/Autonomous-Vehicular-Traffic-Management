@@ -34,23 +34,28 @@ class carGUI:
         self.right = self.canv.create_line(470, 0, 470, 1000, fill='blue', tags='right')
         self.bottom = self.canv.create_line(510, 0, 510, 1000, fill='blue', tags='bottom')
 
+        # Create button to begin simulation
         b = Button(text="click me", command=self.simClickListener)
         b.pack()
 
-        # Create button to begin simulation
-
     def drawCar(self, lane, ID):
 
-        self.master.update_idletasks()  # THIS UPDATES THE GUI
         if(lane == 1):
+            # Draw an X car
             self.rect = self.canv.create_rectangle(0, 480, 10, 490, fill='yellow')
         elif(lane == 2):
+            # Draw a Y car
             self.rect = self.canv.create_rectangle(480, 0, 490, 10, fill='red')
 
+        # Register the ID of the car 
         self.carIDs.append(ID)
+        # Ad the key value pair to the car dictionary for the GUI
         self.carDict[ID] = self.rect
 
     def moveCars(self, carList):
+
+        self.master.update_idletasks()  # THIS UPDATES THE GUI
+
         for i in range(0, len(carList)):
             self.canv.move(self.carDict[carList[i].ID], carList[i].velocityX, carList[i].velocityY)
 
