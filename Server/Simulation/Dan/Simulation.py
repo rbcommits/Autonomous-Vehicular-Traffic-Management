@@ -50,7 +50,7 @@ def simulation(gui):
         carList[i].displayCar()
 
     elapsedTime = 0                                         # initialize time in seconds
-    intervalTime = 1
+    intervalTime = .5
     runSim = True                                           # bool to stop simulation
 
     # Begin simulation:
@@ -80,7 +80,7 @@ def simulation(gui):
 
         # Every seconds generate a new car
         print "Module is:  ", elapsedTime % 1
-        if(elapsedTime % 1 is 0):
+        if(elapsedTime % 1 < .01):
             # Generate a new car
             newCar = randomCarGenerator(gui)
             carList.append(newCar)
