@@ -1,8 +1,8 @@
-def collisionDetection(queueX, queueY):
-    print "Entering Collistion Detection"
+import values
 
-    print queueX.qsize()
-    print queueY.qsize()
+
+def collisionDetection(queueX, queueY, gui):
+    print "Entering Collistion Detection"
 
     if(not queueX.empty() and not queueY.empty()):
         carX = queueX.get()     # attain x car enterint intersection
@@ -12,18 +12,26 @@ def collisionDetection(queueX, queueY):
         if(abs(carX.positionX) < abs(carY.positionY)):
             # X is the first car
             print "x is the first car"
+            gui.highlightCar(carY, "black")
             slowCar(carSlow=carY, carFull=carX, slowY=True)
 
         elif(abs(carY.positionY) < abs(carX.positionX)):
             # Y is the first car
             print "y is the first car"
+            gui.highlightCar(carX, "black")
             slowCar(carSlow=carX, carFull=carY, slowY=False)
 
         else:
             # Both cars have the same position on their relative axis'
             print "they are the same!"
-    else:
-        print "No cars in range of intersection"
+
+    elif(not queueX.empty()):
+        if(queueX.queue[0].positionX > 490):
+            carX = queueX.get()
+
+    elif(not queueY.empty()):
+        if(queueY.queue[0].positionY > 490):
+            carY = queueY.get()
 
 
 # Function to reduce velocity of a car
@@ -40,6 +48,7 @@ def slowCar(carSlow, carFull, slowY):
         print "Slow down the X car"
         while(True):
             carSlow.velocityX = carSlow.velocityX - 0.1
+            carSlow.displayCar()
             if(collide(carX=carSlow, carY=carFull) is False):
                 break
 
@@ -50,8 +59,9 @@ def collide(carX, carY):
     # Create two copies of cars to test
     carTestX = carX
     carTestY = carY
+
     while(True):
-        carTestX.displayCar()
+
         if((carTestX.positionX == carTestY.positionX) and (carTestX.positionY == carTestY.positionY)):
             print "Test collision occured"
             return True
@@ -59,5 +69,5 @@ def collide(carX, carY):
             print "Test succesful regulation"
             return False
 
-        carTestX.updatePosition(0.1)
-        carTestY.updatePosition(0.1)
+        carTestX.updatePosition(values.timeInterval)
+        carTestY.updatePosition(values.timeInterval)

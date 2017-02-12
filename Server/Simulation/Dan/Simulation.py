@@ -1,4 +1,6 @@
 import Calculations
+import time
+import values
 from gui import carGUI
 from random import randint
 from Car import Car
@@ -9,9 +11,44 @@ from Intersection import Intersection
 carList = []
 
 
-def randomCarGenerator(LiveGUI):
-    direction = randint(1, 2)
+def randomCarGenerator(LiveGUI, twoCars, Direction):
+    if(not twoCars):
+        direction = randint(1, 2)
+    else:
+        print "direction"
+        direction = Direction
 
+    velocity = .5
+    ID = randomIDGenerator()
+
+    if(direction == 1):
+        # Generate a vertically traveling car
+        car = Car(length=5, width=5, velocityX=velocity, velocityY=0, startX=-20, startY=0, ID=ID)
+        LiveGUI.drawCar(direction, ID)
+
+    elif(direction == 2):
+        # Generate a vertically traveling car
+        car = Car(length=5, width=5, velocityX=0, velocityY=velocity, startX=0, startY=-20, ID=ID)
+        LiveGUI.drawCar(direction, ID)
+
+    '''
+    elif(direction == 3):
+        # Generate cars in both directions
+        print ID
+        car = Car(length=5, width=5, velocityX=0, velocityY=velocity, startX=0, startY=-20, ID=ID)
+        LiveGUI.drawCar(2, ID)
+        carList.append(car)
+        ID = randomIDGenerator()
+        print ID
+        car = Car(length=5, width=5, velocityX=velocity, velocityY=0, startX=-20, startY=0, ID=ID)
+        LiveGUI.drawCar(1, ID)
+        carList.append(car)
+    '''
+
+    return car
+
+
+def randomIDGenerator():
     # Generate a Unique ID
     generateID = True
     while(generateID):
@@ -20,71 +57,64 @@ def randomCarGenerator(LiveGUI):
         for i in range(0, len(carGUI.carIDs)):
             if ID == carGUI.carIDs[i]:
                 generateID = True
-
-    if(direction == 1):
-        # Generate a vertically traveling car
-        velocityX = 10  # randint(1, 4)
-        car = Car(length=5, width=5, velocityX=velocityX, velocityY=0, startX=-20, startY=0, ID=ID)
-        LiveGUI.drawCar(direction, ID)
-    elif(direction == 2):
-        # Generate a vertically traveling car
-        velocityY = 10    # randint(1, 4)
-        car = Car(length=5, width=5, velocityX=0, velocityY=velocityY, startX=0, startY=-20, ID=ID)
-        LiveGUI.drawCar(direction, ID)
-
-    return car
+    return ID
 
 
 def cleanList(carList, LiveGUI):
     for i in range(len(carList), 0):
         if(carList[i].positionX > 5 or carList[i].positionY > 5):
+            carGUI.carIDs.__delitem__(carList[i].ID)
             del LiveGUI.carDict[carList[i].ID]
             del carList[i]
 
 
 def simulation(gui):
     # Initialize instance of intersection
-    currIntersection = Intersection(100, 100, 10, 10)
+    currIntersection = Intersection(40, 40, 470, 510)
 
     for i in range(0, len(carList)):
         carList[i].displayCar()
 
     elapsedTime = 0                                         # initialize time in seconds
-    intervalTime = .5
     runSim = True                                           # bool to stop simulation
 
     # Begin simulation:
     while(runSim):
 
         # Remove processed cars from the intersection list
-        cleanList(carList, gui)
+        # cleanList(carList, gui)
 
         # Check to see if we should end simulation
-        if(elapsedTime > 1000):
+        if(elapsedTime > values.simluationTime):
             runSim = False                                  # if time condition is true runSim to false
-        elapsedTime += intervalTime                         # increment 100 mili second
+        elapsedTime += values.timeInterval                         # increment 100 mili second
 
         # Check if cars are in intersection range
-        currIntersection.updateIntersectionQueues(carList, elapsedTime)
+        currIntersection.updateIntersectionQueues(carList, elapsedTime, gui)
         # Check for possible collisions
-        Calculations.collisionDetection(currIntersection.queueX, currIntersection.queueY)
+        Calculations.collisionDetection(currIntersection.queueX, currIntersection.queueY, gui)
 
         # Update the positions of the cars in the list
         for i in range(0, len(carList)):
             # THIRD update position
-            carList[i].updatePosition(intervalTime)
-            carList[i].displayPosition()
+            carList[i].updatePosition(values.timeInterval)
 
         # Update the GUI positions
-        gui.moveCars(carList)
+        gui.moveCars(carList, values.timeInterval)
 
-        # Every seconds generate a new car
-        print "Module is:  ", elapsedTime % 1
-        if(elapsedTime % 1 < .01):
-            # Generate a new car
-            newCar = randomCarGenerator(gui)
-            carList.append(newCar)
+        # Every seconds generate new cars
+        if(elapsedTime % values.carGenerationModulo is 0):
+            rndCar = randint(1, 2)
+            if(rndCar == 1):
+                # Generate one car
+                newCar = randomCarGenerator(gui, False, 0)
+                carList.append(newCar)
+            elif(rndCar == 2):
+                # Genereate two cars
+                for i in range(1, 3):
+                    newCar = randomCarGenerator(gui, True, i)
+                    carList.append(newCar)
 
-        # If a car has exited the intersection remove it from the array
+        time.sleep(.01)
 
     print len(carList)
