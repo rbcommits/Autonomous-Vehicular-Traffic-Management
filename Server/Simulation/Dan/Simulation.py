@@ -18,17 +18,17 @@ def randomCarGenerator(LiveGUI, twoCars, Direction):
         print "direction"
         direction = Direction
 
-    velocity = .5
+    velocity = values.maxVelocity
     ID = randomIDGenerator()
 
     if(direction == 1):
         # Generate a vertically traveling car
-        car = Car(length=5, width=5, velocityX=velocity, velocityY=0, startX=-20, startY=0, ID=ID)
+        car = Car(length=5, width=5, velocityX=velocity, velocityY=0, startX=0, startY=0, ID=ID)
         LiveGUI.drawCar(direction, ID)
 
     elif(direction == 2):
         # Generate a vertically traveling car
-        car = Car(length=5, width=5, velocityX=0, velocityY=velocity, startX=0, startY=-20, ID=ID)
+        car = Car(length=5, width=5, velocityX=0, velocityY=velocity, startX=0, startY=0, ID=ID)
         LiveGUI.drawCar(direction, ID)
 
     '''
@@ -70,7 +70,7 @@ def cleanList(carList, LiveGUI):
 
 def simulation(gui):
     # Initialize instance of intersection
-    currIntersection = Intersection(40, 40, 470, 510)
+    currIntersection = Intersection(length=40, wid=40, posX=490, posY=490)
 
     for i in range(0, len(carList)):
         carList[i].displayCar()
@@ -91,6 +91,8 @@ def simulation(gui):
 
         # Check if cars are in intersection range
         currIntersection.updateIntersectionQueues(carList, elapsedTime, gui)
+        # Restore speeds
+        currIntersection.restoreVelocities(carList)
         # Check for possible collisions
         Calculations.collisionDetection(currIntersection.queueX, currIntersection.queueY, gui)
 
@@ -103,6 +105,7 @@ def simulation(gui):
         gui.moveCars(carList, values.timeInterval)
 
         # Every seconds generate new cars
+        '''
         if(elapsedTime % values.carGenerationModulo is 0):
             rndCar = randint(1, 2)
             if(rndCar == 1):
@@ -114,6 +117,12 @@ def simulation(gui):
                 for i in range(1, 3):
                     newCar = randomCarGenerator(gui, True, i)
                     carList.append(newCar)
+        '''
+        if(elapsedTime % values.carGenerationModulo is 0):
+            # Generate two cars
+            for i in range(1, 3):
+                newCar = randomCarGenerator(gui, True, i)
+                carList.append(newCar)
 
         time.sleep(.01)
 

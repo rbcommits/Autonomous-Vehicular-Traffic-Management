@@ -1,10 +1,11 @@
 import values
+import random
 
 
 def collisionDetection(queueX, queueY, gui):
-    print "Entering Collistion Detection"
 
     if(not queueX.empty() and not queueY.empty()):
+        print "Two Cars To Regulate"
         carX = queueX.get()     # attain x car enterint intersection
         carY = queueY.get()     # attain y car entering intersection
 
@@ -24,7 +25,14 @@ def collisionDetection(queueX, queueY, gui):
         else:
             # Both cars have the same position on their relative axis'
             print "they are the same!"
+            rollSlow = random.randint(1, 2)
+            if(rollSlow == 1):
+                slowCar(carSlow=carY, carFull=carX, slowY=True)
+            elif(rollSlow == 2):
+                slowCar(carSlow=carX, carFull=carY, slowY=False)
 
+    # If the cars in the queue and past the intersection without being regulated yet pop it
+    # We dont need it
     elif(not queueX.empty()):
         if(queueX.queue[0].positionX > 490):
             carX = queueX.get()
@@ -40,15 +48,16 @@ def slowCar(carSlow, carFull, slowY):
     if(slowY):
         print "Slow down the Y car"
         while(True):
-            carSlow.velocityY = carSlow.velocityY - 0.1
+            carSlow.velocityY = carSlow.velocityY - 0.4
+            print "Slowed"
             if(collide(carX=carFull, carY=carSlow) is False):
                 break
 
     elif(not slowY):
         print "Slow down the X car"
         while(True):
-            carSlow.velocityX = carSlow.velocityX - 0.1
-            carSlow.displayCar()
+            carSlow.velocityX = carSlow.velocityX - 0.4
+            print "Slowed"
             if(collide(carX=carSlow, carY=carFull) is False):
                 break
 
@@ -61,11 +70,11 @@ def collide(carX, carY):
     carTestY = carY
 
     while(True):
-
-        if((carTestX.positionX == carTestY.positionX) and (carTestX.positionY == carTestY.positionY)):
+    # for i in range(0, 100):
+        if(((carTestX.positionX >= carTestY.positionX - 1) and (carTestX.positionX <= carTestY.positionX + 1)) or ((carTestX.positionY >= carTestY.positionY - 1) and (carTestX.positionY <= carTestY.positionY - 1))):
             print "Test collision occured"
             return True
-        if(abs(carTestX.positionX > 5)):
+        if(abs(carTestX.positionX > 600)):
             print "Test succesful regulation"
             return False
 
