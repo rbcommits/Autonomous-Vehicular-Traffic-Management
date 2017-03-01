@@ -13,6 +13,7 @@ class Car:
         self.positionX = startX         # X start coordinate
         self.positionY = startY         # Y start coordinate
         self.ID = ID                    # Give car unique ID
+        self.waiting = False            # Set the waiting attribute to false
 
     # Print all details of car instance
     def displayCar(self):

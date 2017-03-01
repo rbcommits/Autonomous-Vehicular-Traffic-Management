@@ -5,6 +5,9 @@ import values
 class Intersection:
     queueX = Queue.Queue()                          # Initialize Queue to hold incoming X cars
     queueY = Queue.Queue()                          # Initialize Queue to hold incoming Y cars
+    queueStopX = Queue.Queue()
+    queueStopY = Queue.Queue()
+
 
     def __init__(self, length, wid, posX, posY):
         self.length = length
@@ -52,11 +55,11 @@ class Intersection:
             '''
     def restoreVelocities(self, carList):
         for i in range(0, len(carList)):
-            if(carList[i].positionX > 600 + self.width and carList[i].velocityX < 1 and carList[i].velocityX > 0):
+            if(carList[i].waiting is False and carList[i].positionX > 600 + self.width and carList[i].velocityX < 1 and carList[i].velocityX > 0):
                 carList[i].velocityX = values.maxVelocity
                 carList[i].displayCar()
                 print self.positionX, " and ", self.width
 
-            elif(carList[i].positionY > self.positionY + self.length * 2 and carList[i].velocityY < 1 and carList[i].velocityY > 0):
+            elif(carList[i].waiting is False and carList[i].positionY > self.positionY + self.length * 2 and carList[i].velocityY < 1 and carList[i].velocityY > 0):
                 carList[i].velocityY = values.maxVelocity
                 carList[i].displayCar()

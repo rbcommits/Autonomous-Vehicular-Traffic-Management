@@ -1,6 +1,7 @@
 import Calculations
 import time
 import values
+import Conventional
 from gui import carGUI
 from random import randint
 from Car import Car
@@ -80,7 +81,13 @@ def simulation(gui):
 
     # Begin simulation:
     while(runSim):
+        if(gui.CheckVar.get() == 1):
+            values.conventionalSimFlag = True
+        else:
+            values.conventionalSimFlag = False
 
+        print("WHILE LOOP")
+        print("Intvar", gui.CheckVar.get())
         # Remove processed cars from the intersection list
         # cleanList(carList, gui)
 
@@ -91,10 +98,18 @@ def simulation(gui):
 
         # Check if cars are in intersection range
         currIntersection.updateIntersectionQueues(carList, elapsedTime, gui)
-        # Restore speeds
-        currIntersection.restoreVelocities(carList)
-        # Check for possible collisions
-        Calculations.collisionDetection(currIntersection.queueX, currIntersection.queueY, gui)
+        print(values.conventionalSimFlag)
+        # Check if this is a conventional simulation
+        if(values.conventionalSimFlag):
+            print("inside values falg")
+            Conventional.stopSign(currIntersection.queueX, currIntersection.queueY, gui)
+
+        # Check if this is an optimized simulation
+        else:
+            # Restore speeds
+            currIntersection.restoreVelocities(carList)
+            # Check for possible collisions
+            Calculations.collisionDetection(currIntersection.queueX, currIntersection.queueY, gui)
 
         # Update the positions of the cars in the list
         for i in range(0, len(carList)):

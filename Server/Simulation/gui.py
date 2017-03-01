@@ -1,6 +1,6 @@
 # GUI
-from Tkinter import Canvas, Button
-
+from Tkinter import Canvas, Button, Checkbutton, IntVar
+import values
 
 class carGUI:
 
@@ -33,6 +33,12 @@ class carGUI:
         # Create button to begin simulation
         b = Button(text="Start Simluation!", command=self.simClickListener)
         b.pack()
+
+        # Create checkbox to differentiate real world sim from autonomous sim
+        self.CheckVar = IntVar()
+        self.checkConventional = Checkbutton(text="Conventional System", variable=self.CheckVar, \
+            onvalue=1, offvalue=0, height=5)
+        self.checkConventional.pack()
 
         # Create text fields to show first in queue cars
         self.carDisplayX = self.canv.create_text(10, 10, anchor="nw", fill="red")
