@@ -44,30 +44,30 @@ unsigned long lastSenTime;
 int vSenSpeed = 0;
 bool vSenLastState = false;
 unsigned long vSenTimeout = 500000;
-int mPinFwd = 9;
-int mPinRev = 10;
+int mPinFwdA = 9;
+int mPinFwdB = 10;
 unsigned long scrUpdateTimer = 0;
-unsigned long scrUpdateInt = 500;
+unsigned long scrUpdateInt = 250;
 
 LiquidCrystal lcd(lcdRS, lcdEN, lcdD4, lcdD5, lcdD6, lcdD7);
 
 double mSpeedSet, mSpeedAct, mSpeedPwm;
 
 //Specify the links and initial tuning parameters
-PID mPID(&mSpeedAct, &mSpeedPwm, &mSpeedSet, 0.4, 3.0, 0.01, DIRECT);
+PID mPID(&mSpeedAct, &mSpeedPwm, &mSpeedSet, 0.8, 3, 0.01, DIRECT);
 
 void setup() {
   Serial.begin(115200);
   lcd.begin(16, 2);
   lcd.print("AVTM v0.0.1 Test");
   pinMode(vSen, INPUT);
-  pinMode(mPinFwd, OUTPUT);
-  pinMode(mPinRev, OUTPUT);
+  pinMode(mPinFwdA, OUTPUT);
+  pinMode(mPinFwdB, OUTPUT);
 
   delay(1000);
   lcd.clear();
-  analogWrite(mPinFwd, 127);
-  mSpeedSet = 60;
+  analogWrite(mPinFwdA, 127);
+  mSpeedSet = 120;
   mPID.SetMode(AUTOMATIC);
 }
 
@@ -77,7 +77,7 @@ void loop() {
     displayUpdate();
     scrUpdateTimer = millis();
   }
-  pidUpdate();
+  
 }
 
 void displayUpdate() {
@@ -87,15 +87,15 @@ void displayUpdate() {
   lcd.print("   ");
   lcd.setCursor(9, 0);
   lcd.print("ER: ");
-  lcd.print((int)(100*((mSpeedAct-mSpeedSet)/(mSpeedSet/2.0+mSpeedAct/2.0))));
+  lcd.print((int)(100 * ((mSpeedAct - mSpeedSet) / (mSpeedSet / 2.0 + mSpeedAct / 2.0))));
   lcd.print("   ");
   lcd.setCursor(0, 1);
   lcd.print("SAc: ");
   lcd.print(vSenSpeed);
   lcd.print("   ");
-  lcd.setCursor(9,1);
+  lcd.setCursor(9, 1);
   lcd.print("DC: ");
-  lcd.print((int)(mSpeedPwm/2.55));
+  lcd.print((int)(mSpeedPwm / 2.55));
   lcd.print("   ");
 }
 
@@ -111,11 +111,13 @@ void vSenUpdate() {
   if (micros() - lastSenTime > vSenTimeout) {
     vSenSpeed = 0;
   }
+  pidUpdate();
 }
 
 void pidUpdate() {
   mSpeedAct = vSenSpeed;
   mPID.Compute();
-  analogWrite(mPinFwd,mSpeedPwm);
+  analogWrite(mPinFwdA, mSpeedPwm);
+  analogWrite(mPinFwdB, mSpeedPwm);
 }
 
