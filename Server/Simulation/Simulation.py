@@ -16,7 +16,6 @@ def randomCarGenerator(LiveGUI, twoCars, Direction):
     if(not twoCars):
         direction = randint(1, 2)
     else:
-        print "direction"
         direction = Direction
 
     velocity = values.maxVelocity
@@ -24,12 +23,12 @@ def randomCarGenerator(LiveGUI, twoCars, Direction):
 
     if(direction == 1):
         # Generate a vertically traveling car
-        car = Car(length=5, width=5, velocityX=velocity, velocityY=0, startX=0, startY=0, ID=ID)
+        car = Car(length=5, width=5, velocityX=velocity, velocityY=0, startX=0, startY=0, ID=ID, direction="vertical", startTime=time.time())
         LiveGUI.drawCar(direction, ID)
 
     elif(direction == 2):
         # Generate a vertically traveling car
-        car = Car(length=5, width=5, velocityX=0, velocityY=velocity, startX=0, startY=0, ID=ID)
+        car = Car(length=5, width=5, velocityX=0, velocityY=velocity, startX=0, startY=0, ID=ID, direction="horizontal", startTime=time.time())
         LiveGUI.drawCar(direction, ID)
 
     '''
@@ -61,20 +60,26 @@ def randomIDGenerator():
     return ID
 
 
-def cleanList(carList, LiveGUI):
-    for i in range(len(carList), 0):
-        if(carList[i].positionX > 5 or carList[i].positionY > 5):
-            carGUI.carIDs.__delitem__(carList[i].ID)
-            del LiveGUI.carDict[carList[i].ID]
-            del carList[i]
+def cleanList(carList, gui, currIntersection):
+    for i in range(0, len(carList)):
+        if((carList[i].positionX > currIntersection.positionX + currIntersection.width * 8) or (carList[i].positionY > currIntersection.positionY + currIntersection.length * 8)):
+            if(values.conventionalSimFlag and not carList[i].timeStamped):
+                print("THIS CARS POSITION IS: ", carList[i].positionX, carList[i].positionY)
+                values.conventional_times.append(time.time() - carList[i].startTime)
+                carList[i].timeStamped = True
+
+            elif(not values.conventionalSimFlag and not carList[i].timeStamped):
+                print("THIS CARS POSITION IS: ", carList[i].positionX, carList[i].positionY)
+                values.optimized_times.append(time.time() - carList[i].startTime)
+                carList[i].timeStamped = True
+
+            # del gui.carDict[carList[i].ID]
+            # del carList[i]
 
 
 def simulation(gui):
     # Initialize instance of intersection
     currIntersection = Intersection(length=40, wid=40, posX=490, posY=490)
-
-    for i in range(0, len(carList)):
-        carList[i].displayCar()
 
     elapsedTime = 0                                         # initialize time in seconds
     runSim = True                                           # bool to stop simulation
@@ -86,10 +91,8 @@ def simulation(gui):
         else:
             values.conventionalSimFlag = False
 
-        print("WHILE LOOP")
-        print("Intvar", gui.CheckVar.get())
         # Remove processed cars from the intersection list
-        # cleanList(carList, gui)
+        cleanList(carList, gui, currIntersection)
 
         # Check to see if we should end simulation
         if(elapsedTime > values.simluationTime):
@@ -98,16 +101,15 @@ def simulation(gui):
 
         # Check if cars are in intersection range
         currIntersection.updateIntersectionQueues(carList, elapsedTime, gui)
-        print(values.conventionalSimFlag)
+
+        currIntersection.restoreVelocities(carList)
+
         # Check if this is a conventional simulation
         if(values.conventionalSimFlag):
-            print("inside values falg")
             Conventional.stopSign(currIntersection.queueX, currIntersection.queueY, gui)
 
         # Check if this is an optimized simulation
         else:
-            # Restore speeds
-            currIntersection.restoreVelocities(carList)
             # Check for possible collisions
             Calculations.collisionDetection(currIntersection.queueX, currIntersection.queueY, gui)
 
@@ -133,12 +135,32 @@ def simulation(gui):
                     newCar = randomCarGenerator(gui, True, i)
                     carList.append(newCar)
         '''
-        if(elapsedTime % values.carGenerationModulo is 0):
-            # Generate two cars
-            for i in range(1, 3):
-                newCar = randomCarGenerator(gui, True, i)
-                carList.append(newCar)
+
+        if(not values.conventionalStoppedX and not values.conventionalStoppedY):
+            if(elapsedTime % values.carGenerationModulo is 0):
+                # Generate two cars
+                for i in range(1, 3):
+                    newCar = randomCarGenerator(gui, True, i)
+                    carList.append(newCar)
 
         time.sleep(.01)
 
-    print len(carList)
+    if(values.conventionalSimFlag):
+        size_conv = len(values.conventional_times)
+        sum_conv = 0
+        for i in range(0, size_conv):
+            sum_conv = sum_conv + values.conventional_times[i]
+
+        avg_conv = sum_conv / size_conv
+
+        print("CONVENTIONAL AVERAGE: ", avg_conv)
+
+    else:
+        size_opt = len(values.optimized_times)
+        sum_opt = 0
+        for i in range(0, size_opt):
+            sum_opt = sum_opt + values.optimized_times[i]
+
+        avg_opt = sum_opt / size_opt
+
+        print("OPTIMIZED AVERAGE: ", avg_opt)

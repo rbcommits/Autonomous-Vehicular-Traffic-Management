@@ -36,8 +36,7 @@ class carGUI:
 
         # Create checkbox to differentiate real world sim from autonomous sim
         self.CheckVar = IntVar()
-        self.checkConventional = Checkbutton(text="Conventional System", variable=self.CheckVar, \
-            onvalue=1, offvalue=0, height=5)
+        self.checkConventional = Checkbutton(text="Conventional System", variable=self.CheckVar, onvalue=1, offvalue=0, height=5)
         self.checkConventional.pack()
 
         # Create text fields to show first in queue cars
