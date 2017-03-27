@@ -1,5 +1,5 @@
 # Here we declare global values that are used throughout
-# the interesection management module 
+# the interesection management module
 
 
 # CAR VALUES
