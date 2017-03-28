@@ -22,6 +22,7 @@ conventionalSimFlag = False
 conventional_stop_sign_wait = 3
 conventionalStoppedX = False
 conventionalStoppedY = False
+proceedVert = 1
 
 # STATISTICAL VALUES
 optimized_times = []

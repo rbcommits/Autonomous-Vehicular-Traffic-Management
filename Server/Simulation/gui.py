@@ -66,6 +66,10 @@ class carGUI:
         for i in range(0, len(carList)):
             self.canv.move(self.carDict[carList[i].ID], carList[i].velocityX * timeInterval, carList[i].velocityY * timeInterval)
 
+    def moveCar(self, car, timeInterval):
+        self.master.update_idletasks()
+        self.canv.move(self.carDict[car.ID], car.velocityX * timeInterval, car.velocityY * timeInterval)
+
     def highlightCar(self, car, color):
         self.canv.itemconfig(self.carDict[car.ID], fill=color)
 

@@ -121,21 +121,6 @@ def simulation(gui):
         # Update the GUI positions
         gui.moveCars(carList, values.timeInterval)
 
-        # Every seconds generate new cars
-        '''
-        if(elapsedTime % values.carGenerationModulo is 0):
-            rndCar = randint(1, 2)
-            if(rndCar == 1):
-                # Generate one car
-                newCar = randomCarGenerator(gui, False, 0)
-                carList.append(newCar)
-            elif(rndCar == 2):
-                # Genereate two cars
-                for i in range(1, 3):
-                    newCar = randomCarGenerator(gui, True, i)
-                    carList.append(newCar)
-        '''
-
         if(not values.conventionalStoppedX and not values.conventionalStoppedY):
             if(elapsedTime % values.carGenerationModulo is 0):
                 # Generate two cars
