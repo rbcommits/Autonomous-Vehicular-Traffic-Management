@@ -72,14 +72,11 @@ def process_done_waiting(gui, queueX, queueY):
     if(not queueDoneWaitingX.empty() and not queueDoneWaitingY.empty()):
         # Fetch the cars from the done waiting queues
         print("WE HAVE BOTHHHH")
-        time.sleep(0.000000001)
         carX = queueDoneWaitingX.get()
         carY = queueDoneWaitingY.get()
 
         if(values.proceedVert % 2 == 0):
             values.proceedVert += 1
-            print("INSIDE BOTH QUEUES IF")
-            time.sleep(1)
 
             carX.velocityX = values.maxVelocity
             # .conventionalStoppedX = False
@@ -93,9 +90,6 @@ def process_done_waiting(gui, queueX, queueY):
             values.conventionalStoppedX = False
             values.conventionalStoppedY = False
         else:
-            print("INSIDE BOTH QUEUES ELSE")
-            time.sleep(1)
-
             values.proceedVert += 1
             carY.velocityY = values.maxVelocity
             # values.conventionalStoppedX = True
@@ -134,23 +128,24 @@ def move_lane(car, gui, queueX, queueY):
 
     curr_time = time.time()
 
-    while(time.time() - curr_time <= 2):
+    while(time.time() - curr_time <= 1.4):
         print("SPECIAL MOVE")
 
-        stopSign(queueX, queueY, gui)
+        # stopSign(queueX, queueY, gui)
+        timeStart = time.time()             # TIME START
 
         # While we move the car queued to move next we must also move all cars beyond the intersection limits to maintain the integrity of the system
         for i in range(0, len(Simulation.carList)):
             if(Simulation.carList[i].ID != car.ID):
 
-                if(Simulation.carList[i].positionX >= values.intersection_width + values.intersection_posX):
+                if((Simulation.carList[i].positionX >= values.intersection_width + values.intersection_posX) / 1.11):
                     Simulation.carList[i].updatePosition(values.timeInterval)
                     gui.moveCar(Simulation.carList[i], values.timeInterval)
 
                     gui.highlightCar(Simulation.carList[i], "yellow")
                     gui.updateCarInformationDisplay(Simulation.carList[i])
 
-                elif(Simulation.carList[i].positionY >= values.intersection_length + values.intersection_posY):
+                elif(Simulation.carList[i].positionY >= (values.intersection_length + values.intersection_posY) / 1.11):
                     Simulation.carList[i].updatePosition(values.timeInterval)
                     gui.moveCar(Simulation.carList[i], values.timeInterval)
 
@@ -160,4 +155,9 @@ def move_lane(car, gui, queueX, queueY):
         car.updatePosition(values.timeInterval)
 
         gui.moveCar(car, values.timeInterval)
+
+        timeEnd = time.time()           # TIME END
+
+        Simulation.update_car_delay(-(timeEnd - timeStart))
+
         time.sleep(.01)

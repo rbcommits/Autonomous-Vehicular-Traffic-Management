@@ -4,6 +4,7 @@ class Car:
     intersectionTimeStamp = 0
     accelerationX = 0           # X Acceleration in meters/(second per second)
     accelerationY = 0           # Y Acceleration in meters/(second per second)
+    calculationTime = 0         # Attribute to track the total time spent in calculations
 
     def __init__(self, length, width, velocityX, velocityY, startX, startY, ID, direction, startTime):
         self.length = length            # Length in meters
@@ -15,7 +16,7 @@ class Car:
         self.ID = ID                    # Give car unique ID
         self.waiting = False            # Set the waiting attribute to false
         self.direction = direction
-        self.startTime = startTime
+        self.startTime = startTime      # This is the cars stamped time. We must monitor how much time the car spends inside calculations as well
         self.timeStamped = False
 
     # Print all details of car instance

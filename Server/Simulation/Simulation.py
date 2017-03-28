@@ -12,7 +12,158 @@ from Intersection import Intersection
 carList = []
 
 
+def simulation(gui):
+    # Initialize instance of intersection
+    currIntersection = Intersection(length=40, wid=40, posX=490, posY=490)
+
+    elapsedTime = 0                                         # initialize time in seconds
+    runSim = True                                           # bool to stop simulation
+
+    # Begin simulation:
+    while(runSim):
+
+        # Determine what kind of simulation we're running
+        if(gui.CheckVar.get() == 1):
+            values.conventionalSimFlag = True
+        else:
+            values.conventionalSimFlag = False
+
+        # Remove processed cars from the intersection list
+        cleanList(carList, gui, currIntersection)
+
+        # Check to see if we should end simulation
+        if(elapsedTime > values.simluationTime):
+            runSim = False                                  # if time condition is true runSim to false
+        elapsedTime += values.timeInterval                  # increment 100 mili second
+
+        # Update the intersection containers and values
+        update_intersection(currIntersection, elapsedTime, gui)
+
+        # Check if this is a conventional simulation
+        if(values.conventionalSimFlag):
+            run_conventional(currIntersection, gui)
+
+        # Check if this is an optimized simulation
+        else:
+            run_optimized(currIntersection, gui)
+
+        # Update the positions of the cars
+        update_positions(gui)
+
+        # Generate new cars
+        generate_cars(gui, elapsedTime)
+
+        # Sleep the while loop
+        time.sleep(.01)
+
+    generate_statistics()
+
+
+def run_optimized(intersection, gui):
+    timeStart = time.time()             # START TIME
+
+    Calculations.collisionDetection(intersection.queueX, intersection.queueY, gui)
+
+    timeEnd = time.time()
+
+    # Call the delay update function
+    update_car_delay((timeEnd - timeStart))
+
+
+def run_conventional(intersection, gui):
+    timeStart = time.time()             # START TIME
+    Conventional.stopSign(intersection.queueX, intersection.queueY, gui)
+
+    timeEnd = time.time()               # END TIME
+
+    # Call the delay update function
+    update_car_delay((timeEnd - timeStart))
+
+
+def update_intersection(intersection, elapsedTime, gui):
+        timeStart = time.time()         # START TIME
+
+        intersection.updateIntersectionQueues(carList, elapsedTime, gui)
+        intersection.restoreVelocities(carList)
+
+        timeEnd = time.time()           # END TIME
+
+        # Call the delay update function
+        update_car_delay((timeEnd - timeStart))
+
+
+def update_positions(gui):
+        timeStart = time.time()         # START TIME
+
+        # Update the positions of the cars in the list
+        for i in range(0, len(carList)):
+            # THIRD update position
+            carList[i].updatePosition(values.timeInterval)
+
+        # Update GUI
+        gui.moveCars(carList, values.timeInterval)
+
+        timeEnd = time.time()           # END TIME
+
+        # Call the delay update function
+        update_car_delay((timeEnd - timeStart))
+
+
+def generate_cars(gui, elapsedTime):
+        timeStart = time.time()         # START TIME
+
+        if(not values.conventionalStoppedX and not values.conventionalStoppedY):
+            if(elapsedTime % values.carGenerationModulo is 0):
+                # Generate two cars
+                for i in range(1, 3):
+                    newCar = randomCarGenerator(gui, True, i)
+                    carList.append(newCar)
+
+        timeEnd = time.time()           # END TIME
+
+        # Call the delay update function
+        update_car_delay((timeEnd - timeStart))
+
+
+def generate_statistics():
+    if(values.conventionalSimFlag):
+        size_conv = len(values.conventional_times)
+        sum_conv = 0
+        for i in range(0, size_conv):
+            sum_conv = sum_conv + values.conventional_times[i]
+
+        avg_conv = sum_conv / size_conv
+
+        sum_conv_calc_times = 0
+        for i in range(0, len(values.conventional_calculation_times)):
+            sum_conv_calc_times += values.conventional_calculation_times[i]
+
+        avg_conv_calc_times = sum_conv_calc_times / len(values.conventional_calculation_times)
+
+        print("CONVENTIONAL AVERAGE: ", avg_conv)
+        print("CONVENTIONAL AVERAGE CALCULATION TIME: ", avg_conv_calc_times)
+
+    else:
+        size_opt = len(values.optimized_times)
+        sum_opt = 0
+        for i in range(0, size_opt):
+            sum_opt = sum_opt + values.optimized_times[i]
+
+        avg_opt = sum_opt / size_opt
+
+        sum_opt_calc_times = 0
+        for i in range(0, len(values.optimized_calculation_times)):
+            sum_opt_calc_times += values.optimized_calculation_times[i]
+
+        avg_opt_calc_times = sum_opt_calc_times / len(values.optimized_calculation_times)
+
+        print("OPTIMIZED AVERAGE: ", avg_opt)
+        print("OPTIMIZED AVERAGE CALCULATION TIME: ", avg_opt_calc_times)
+
+
 def randomCarGenerator(LiveGUI, twoCars, Direction):
+    timeStart = time.time()         # TIME START
+
     if(not twoCars):
         direction = randint(1, 2)
     else:
@@ -45,10 +196,17 @@ def randomCarGenerator(LiveGUI, twoCars, Direction):
         carList.append(car)
     '''
 
+    timeEnd = time.time()           # TIME END
+
+    # Call the delay update function
+    update_car_delay((timeEnd - timeStart))
+
     return car
 
 
 def randomIDGenerator():
+    timeStart = time.time()         # TIME START
+
     # Generate a Unique ID
     generateID = True
     while(generateID):
@@ -57,6 +215,12 @@ def randomIDGenerator():
         for i in range(0, len(carGUI.carIDs)):
             if ID == carGUI.carIDs[i]:
                 generateID = True
+
+    timeEnd = time.time()           # END TIME
+
+    # Call the delay update function
+    update_car_delay((timeEnd - timeStart))
+
     return ID
 
 
@@ -65,87 +229,27 @@ def cleanList(carList, gui, currIntersection):
         if((carList[i].positionX > currIntersection.positionX + currIntersection.width * 8) or (carList[i].positionY > currIntersection.positionY + currIntersection.length * 8)):
             if(values.conventionalSimFlag and not carList[i].timeStamped):
                 print("THIS CARS POSITION IS: ", carList[i].positionX, carList[i].positionY)
-                values.conventional_times.append(time.time() - carList[i].startTime)
+                values.conventional_times.append(time.time() - carList[i].startTime - carList[i].calculationTime)
+                values.conventional_calculation_times.append(carList[i].calculationTime)
                 carList[i].timeStamped = True
 
             elif(not values.conventionalSimFlag and not carList[i].timeStamped):
                 print("THIS CARS POSITION IS: ", carList[i].positionX, carList[i].positionY)
-                values.optimized_times.append(time.time() - carList[i].startTime)
+                values.optimized_times.append(time.time() - carList[i].startTime - carList[i].calculationTime)
+                values.optimized_calculation_times.append(carList[i].calculationTime)
                 carList[i].timeStamped = True
 
             # del gui.carDict[carList[i].ID]
             # del carList[i]
 
 
-def simulation(gui):
-    # Initialize instance of intersection
-    currIntersection = Intersection(length=40, wid=40, posX=490, posY=490)
+def update_car_delay(time):
+    # timeStart = time.time()         # TIME START
 
-    elapsedTime = 0                                         # initialize time in seconds
-    runSim = True                                           # bool to stop simulation
+    for i in range(0, len(carList)):
+        carList[i].calculationTime += time
 
-    # Begin simulation:
-    while(runSim):
-        if(gui.CheckVar.get() == 1):
-            values.conventionalSimFlag = True
-        else:
-            values.conventionalSimFlag = False
+    # timeEnd = time.time()           # TIME END
 
-        # Remove processed cars from the intersection list
-        cleanList(carList, gui, currIntersection)
-
-        # Check to see if we should end simulation
-        if(elapsedTime > values.simluationTime):
-            runSim = False                                  # if time condition is true runSim to false
-        elapsedTime += values.timeInterval                         # increment 100 mili second
-
-        # Check if cars are in intersection range
-        currIntersection.updateIntersectionQueues(carList, elapsedTime, gui)
-
-        currIntersection.restoreVelocities(carList)
-
-        # Check if this is a conventional simulation
-        if(values.conventionalSimFlag):
-            Conventional.stopSign(currIntersection.queueX, currIntersection.queueY, gui)
-
-        # Check if this is an optimized simulation
-        else:
-            # Check for possible collisions
-            Calculations.collisionDetection(currIntersection.queueX, currIntersection.queueY, gui)
-
-        # Update the positions of the cars in the list
-        for i in range(0, len(carList)):
-            # THIRD update position
-            carList[i].updatePosition(values.timeInterval)
-
-        # Update the GUI positions
-        gui.moveCars(carList, values.timeInterval)
-
-        if(not values.conventionalStoppedX and not values.conventionalStoppedY):
-            if(elapsedTime % values.carGenerationModulo is 0):
-                # Generate two cars
-                for i in range(1, 3):
-                    newCar = randomCarGenerator(gui, True, i)
-                    carList.append(newCar)
-
-        time.sleep(.01)
-
-    if(values.conventionalSimFlag):
-        size_conv = len(values.conventional_times)
-        sum_conv = 0
-        for i in range(0, size_conv):
-            sum_conv = sum_conv + values.conventional_times[i]
-
-        avg_conv = sum_conv / size_conv
-
-        print("CONVENTIONAL AVERAGE: ", avg_conv)
-
-    else:
-        size_opt = len(values.optimized_times)
-        sum_opt = 0
-        for i in range(0, size_opt):
-            sum_opt = sum_opt + values.optimized_times[i]
-
-        avg_opt = sum_opt / size_opt
-
-        print("OPTIMIZED AVERAGE: ", avg_opt)
+    # Call the delay update function
+    # update_car_delay((timeEnd - timeStart))

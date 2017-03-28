@@ -25,5 +25,8 @@ conventionalStoppedY = False
 proceedVert = 1
 
 # STATISTICAL VALUES
-optimized_times = []
-conventional_times = []
+optimized_times = []					# Container for time spent in an intersection for an optimized vehicle minus the calculation time
+conventional_times = []					# Container for the time spent in an intersection for a conventional vehicle minus the calculation time
+
+optimized_calculation_times = []		# Times a optimized vehicle runs in the intersection
+conventional_calculation_times = []		# Times a conventional vehicle spends in an intersection
