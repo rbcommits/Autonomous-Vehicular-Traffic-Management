@@ -2,6 +2,7 @@
 from Tkinter import Canvas, Button, Checkbutton, IntVar
 import values
 
+
 class carGUI:
 
     carDict = {}
@@ -54,7 +55,7 @@ class carGUI:
 
         self.canv.addtag_below(self.rect, "HELLO")
 
-        # Register the ID of the car 
+        # Register the ID of the car
         self.carIDs.append(ID)
         # Ad the key value pair to the car dictionary for the GUI
         self.carDict[ID] = self.rect

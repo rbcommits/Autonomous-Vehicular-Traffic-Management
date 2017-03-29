@@ -112,6 +112,8 @@ def process_done_waiting(gui, queueX, queueY):
         carX.velocityX = values.maxVelocity
         move_lane(carX, gui, queueX, queueY)
 
+        values.conventionalStoppedX = False
+
     elif(not queueDoneWaitingY.empty()):
         print("ELIF Y NOT EMPTY")
         print("STOPPEDX = ", values.conventionalStoppedX, " STOPPED Y = ", values.conventionalStoppedY)
@@ -120,6 +122,8 @@ def process_done_waiting(gui, queueX, queueY):
         carY = queueDoneWaitingY.get()
         carY.velocityY = values.maxVelocity
         move_lane(carY, gui, queueX, queueY)
+
+        values.conventionalStoppedY = False
 
     return
 
