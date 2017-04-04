@@ -6,7 +6,8 @@ from gui import carGUI
 from random import randint
 from Car import Car
 from Intersection import Intersection
-
+import server
+import client
 
 # Initialize array to contain cars
 carList = []
@@ -52,6 +53,9 @@ def simulation(gui):
 
         # Generate new cars
         generate_cars(gui, elapsedTime)
+
+        # Call server communications
+        # server_send_packet()
 
         # Sleep the while loop
         time.sleep(.01)
@@ -175,11 +179,13 @@ def randomCarGenerator(LiveGUI, twoCars, Direction):
     if(direction == 1):
         # Generate a vertically traveling car
         car = Car(length=5, width=5, velocityX=velocity, velocityY=0, startX=0, startY=0, ID=ID, direction="vertical", startTime=time.time())
+        server_receive_packet(car)
         LiveGUI.drawCar(direction, ID)
 
     elif(direction == 2):
         # Generate a vertically traveling car
         car = Car(length=5, width=5, velocityX=0, velocityY=velocity, startX=0, startY=0, ID=ID, direction="horizontal", startTime=time.time())
+        server_receive_packet(car)
         LiveGUI.drawCar(direction, ID)
 
     '''
@@ -253,3 +259,27 @@ def update_car_delay(time):
 
     # Call the delay update function
     # update_car_delay((timeEnd - timeStart))
+
+
+'''
+def server_send_packet():
+    print("server comm")
+    msg = []
+
+    for i in range(0, len(carList)):
+
+        msg.append(carList[i].velocityX)
+        msg.append(carList[i].velocityY)
+        msg.append(carList[i].positionX)
+        msg.append(carList[i].positionY)
+        print("msg created")
+        server.simulate(carList[i].ID, msg)
+        print("return from server")
+'''
+
+
+def server_receive_packet(car):
+    # server.update_queue((1, car))
+    print("I HAVE LEFT")
+    client.newCar(car)
+    print("I HAVE RETURNED")

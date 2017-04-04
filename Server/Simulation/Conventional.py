@@ -67,6 +67,13 @@ def wait(car):
             return
 
 
+'''
+
+POISSON ARRIVAL TIMES
+
+'''
+
+
 def process_done_waiting(gui, queueX, queueY):
 
     if(not queueDoneWaitingX.empty() and not queueDoneWaitingY.empty()):

@@ -2,6 +2,7 @@ import zmq
 import sys
 import threading
 import time
+import Car
 from Queue import *
 # import Queue
 import zlib, cPickle as pickle
@@ -100,33 +101,81 @@ def tprint(msg):
     sys.stdout.flush()
 
 
-class Car(object):
-    ID = ""
-    length = 0
-    linear_velocity = 0
-    angular_velocity = 0
-    # add other things here in future if needed
 
-    def __init__(self, ID, length, linear=0, angular=0):
-        self.ID = ID
-        self.length = length
-        self.linear_velocity = linear
-        self.angular_velocity = angular
+class Car:
+    inQueue = False
+    intersectionTimeStamp = 0
+    accelerationX = 0           # X Acceleration in meters/(second per second)
+    accelerationY = 0           # Y Acceleration in meters/(second per second)
+    calculationTime = 0         # Attribute to track the total time spent in calculations
+
+    def __init__(self, length, width, velocityX, velocityY, startX, startY, ID, direction, startTime):
+        self.length = length            # Length in meters
+        self.width = width              # Width in meters
+        self.velocityX = velocityX      # X Velocity in meters/second
+        self.velocityY = velocityY      # Y Velocity in meters/second
+        self.positionX = startX         # X start coordinate
+        self.positionY = startY         # Y start coordinate
+        self.ID = ID                    # Give car unique ID
+        self.waiting = False            # Set the waiting attribute to false
+        self.direction = direction
+        self.startTime = startTime      # This is the cars stamped time. We must monitor how much time the car spends inside calculations as well
+        self.timeStamped = False
+
+    # Print all details of car instance
+    def displayCar(self):
+        print "Length: ", self.length
+        print "Width: ", self.width
+        print "X Position: ", self.positionX
+        print "Y Position: ", self.positionY
+        print "X Velocity: ", self.velocityX
+        print "Y Velocity: ", self.velocityY
+        print "X Acceleration: ", self.accelerationX
+        print "Y Acceleration: ", self.accelerationY
+
+    def displayPosition(self):
+        print "(", self.positionX, ", ", self.positionY, ")"
+
+    def displayVelocity(self):
+        print "(", self.velocityX, ", ", self.velocityY, ")"
+
+    def displayAcceleration(self):
+        print "(", self.accelerationX, ", ", self.accelerationX, ")"
+
+    def updatePosition(self, time):
+        self.positionX = self.positionX + self.velocityX * time
+        self.positionY = self.positionY + self.velocityY * time
+
+    # Calculate velocity
+    def updateVelocity(self, newPositionX, newPositionY):
+        self.velocityX = newPositionX - self.positionX
+        self.velocityY = newPositionY - self.positionY
+
+    # Calculate acceleartion
+    def updateAcceleration(self, newVelocityX, newVelocityY):
+        self.accelerationX = newVelocityX - self.velocityX
+        self.accelerationY = newVelocityY - self.velocityY
 
 
 def simulate(ID, msg):
     # start simulation here
+    print("server simulate")
 
     # Simulation done, final velocities calculated
     # time to send data back to the car
     # To make this program work, I set velocity_queue = car_queue so the workers have something to send back
     # but in general, velocity queue should be filled up by the algorithm and then the workers can pull from it and send data back
 
+    print("server velocity queue")
     velocity_queue = car_queue                      # remove this once you start populating this queue via the algorithm
+    print("Get velocity queue")
     worker_ID, car = velocity_queue.get()
+    print("allocate worker object")
     worker = object()
 
+    print("server for loop")
     for workers in server_workers:
+        print("workers.ID = ", workers.ID, "worker_ID = ", worker_ID)
         if worker_ID == workers.ID:
             worker = workers
 
@@ -134,12 +183,14 @@ def simulate(ID, msg):
     # msg = "Hello from worker " + str(worker.ID)
 
     # Send packet to car
+    print("about to send message")
     worker.worker.send_multipart([ID, msg])
 
 
 def update_queue(object):
+    print("OBJECT TUPLE = ", object)
     car_queue.put(object)
-    simulate()
+    # simulate()
 
 
 def deserialize(msg):
@@ -188,15 +239,15 @@ class ServerWorker(threading.Thread):
         while True:
             ID, msg = self.worker.recv_multipart()
             msg = deserialize(msg)
-            tprint('Worker received %s from %s' % (msg.ID, ID))
+            tprint('Worker received %s from %s' % (msg, ID))
 
             # Add to queue here (both ID and message as an object)
             # or update queue if car ID already exixts
 
             # We include the ID of the worker who received the request so we can later use the same
             # worker to send the updated velocity back
-            car = [self.ID, Car(ID, msg)]
-            # pdate_queue(car)
+            car = Car(length=msg.length, width=msg.width, velocityX=msg.velocityX, velocityY=msg.velocityY, startX=msg.positionX, startY=msg.positionY, ID=msg.ID, direction=msg.direction, startTime=msg.startTime)
+            update_queue(car)
             #  car_queue.queue(car)
             # somequeue.queue(car)
             # worker.send_multipart([ID, msg])
@@ -204,6 +255,7 @@ class ServerWorker(threading.Thread):
         self.worker.close()
 
 
+# def main_func():
 if __name__ == "__main__":
     server = ServerTask()
     server.start()
