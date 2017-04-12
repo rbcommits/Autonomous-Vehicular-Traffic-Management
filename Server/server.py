@@ -2,9 +2,9 @@ import zmq
 import sys
 import threading
 import time
-from Queue import *
+from queue import *
 # import Queue
-import zlib, cPickle as pickle
+import zlib, pickle as pickle
 
 PORT = 'tcp://*:5570'   # change this to whatever port you want your server to run on
 """

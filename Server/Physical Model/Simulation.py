@@ -52,7 +52,7 @@ def simulation(gui):
         update_positions(gui)
 
         # Generate new cars
-        generate_cars(gui, elapsedTime)
+        # generate_cars(gui, elapsedTime)
 
         # Call server communications
         # server_send_packet()
@@ -259,6 +259,10 @@ def update_car_delay(time):
 
     # Call the delay update function
     # update_car_delay((timeEnd - timeStart))
+
+
+def receiveCar(car):
+    carList.append(car)
 
 
 '''
