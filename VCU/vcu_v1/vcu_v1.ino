@@ -22,8 +22,8 @@ unsigned long scrUpdateTimer = 0;
 unsigned long scrUpdateInt = 250;
 int vCom = 0;
 int sCom = 127;
-int vComPwmMax = 255;
-int sComPwmMax = 127;
+int vComPwmMax = 95;
+int sComPwmMax = 95;
 int i2cIndex = 0;
 int mSpeedMult = 20;
 unsigned long lastRecvTime = 0;
@@ -85,11 +85,13 @@ void mDriveCmd() {
   } else {
     analogWrite(mPinFwdA, vComPwmMax);
   }
+  /*
   if (mSpeedPwm <= vComPwmMax) {
     analogWrite(mPinFwdB, mSpeedPwm);
   } else {
     analogWrite(mPinFwdB, vComPwmMax);
   }
+  */
 }
 
 void sDriveCmd() {
