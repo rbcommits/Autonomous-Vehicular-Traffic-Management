@@ -14,16 +14,20 @@ unsigned long lastSenTime;
 int vSenSpeed = 0;
 bool vSenLastState = false;
 unsigned long vSenTimeout = 500000;
-int mPinFwdA = 9;
-int mPinFwdB = 10;
-int sComPinL = 5;
-int sComPinR = 6;
+int mPinFwdA = 5;
+int mPinFwdB = 6;
+int sPinL = 11;
+int sPinR = 10;
 unsigned long scrUpdateTimer = 0;
 unsigned long scrUpdateInt = 250;
 int vCom = 0;
-int sCom = 0;
-int vComPwmMax = 95;
-int sComPwmMax = 95;
+int sCom = 127;
+int vComPwmMax = 255;
+int sComPwmMax = 127;
+int i2cIndex = 0;
+int mSpeedMult = 20;
+unsigned long lastRecvTime = 0;
+int cmdTimeout = 1000;
 
 
 double mSpeedSet, mSpeedAct, mSpeedPwm;
@@ -38,13 +42,14 @@ void setup() {
   pinMode(vSen, INPUT);
   pinMode(mPinFwdA, OUTPUT);
   pinMode(mPinFwdB, OUTPUT);
-  analogWrite(mPinFwdA, 127);
+  analogWrite(mPinFwdA, 0);
   mSpeedSet = 1500;
   mPID.SetMode(AUTOMATIC);
 }
 
 void loop() {
   vSenUpdate();
+  watchDog();
 }
 
 void vSenUpdate() {
@@ -60,37 +65,82 @@ void vSenUpdate() {
     vSenSpeed = 0;
   }
   pidUpdate();
-  Serial.println(vSenSpeed);
 }
 
 void pidUpdate() {
   mSpeedAct = vSenSpeed;
   mPID.Compute();
   mDriveSet();
+  mDriveCmd();
+  sDriveCmd();
 }
 
-void mDriveSet(){
-  if(mSpeedPwm <= vComPwmMax){
+void mDriveSet() {
+  mSpeedSet = vCom * mSpeedMult;
+}
+
+void mDriveCmd() {
+  if (mSpeedPwm <= vComPwmMax) {
     analogWrite(mPinFwdA, mSpeedPwm);
   } else {
     analogWrite(mPinFwdA, vComPwmMax);
   }
-  if(mSpeedPwm <= vComPwmMax){
+  if (mSpeedPwm <= vComPwmMax) {
     analogWrite(mPinFwdB, mSpeedPwm);
   } else {
     analogWrite(mPinFwdB, vComPwmMax);
   }
+}
 
-
+void sDriveCmd() {
+  // left steer, invert
+  if (sCom == 127) {
+    analogWrite(sPinL, 0);
+    analogWrite(sPinR, 0);
+  }
+  if (sCom < 127) {
+    analogWrite(sPinR, 0);
+    analogWrite(sPinL, map(sCom, 127, 0, 0, sComPwmMax));
+  }
+  if (sCom > 127) {
+    analogWrite(sPinL, 0);
+    analogWrite(sPinR, map(sCom, 128, 255, 0, sComPwmMax));
+  }
 
 }
 
-void i2c_recv(int length){
-  while(Wire.available() > 0){
+void i2c_recv(int length) {
+  while (Wire.available() > 0) {
     int c = Wire.read();
-    if(c == 'c'){
-      vCom = Wire.read();
-      sCom = Wire.read();
+    lastRecvTime = millis();
+    Serial.print("Command execution read: ");
+    Serial.println(c);
+    if (i2cIndex == 2) {
+      i2cIndex = 0;
+      sCom = c;
+      Serial.print("sCom receive: ");
+      Serial.println(sCom);
+    }
+    
+    if (i2cIndex == 1) {
+      i2cIndex = 2;
+      vCom = c;
+      Serial.print("vCom receive: ");
+      Serial.println(vCom);
+    }
+    
+    if (c == 'c' || i2cIndex == 0) {
+      i2cIndex = 1;
     }
   }
 }
+
+void watchDog(){
+  if(millis() > lastRecvTime + cmdTimeout){
+    vCom = 0;
+    sCom = 127;
+    analogWrite(sPinL, 0);
+    analogWrite(sPinR, 0);
+  }
+}
+
