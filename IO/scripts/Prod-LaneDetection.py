@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import time
-import Driver
+import smbus
 
 # Diagnostic info
 droppedframes = 0
@@ -32,16 +32,18 @@ def check_shape(c):
 
     if len(approx) == 4:
         # this is a rectangle
-
+        return True
         # compute the bounding box of the contour and use the
         # bounding box to compute the aspect ratio
         (x, y, w, h) = cv2.boundingRect(approx)
         ar = w / float(h)
+        '''
         if ar > 1:
             # if width is greater than height, it is not a lane segment
             return False
         else:
             return True
+        '''
     else:
         # shape has more than 4 corners
         return False
@@ -50,11 +52,20 @@ def check_shape(c):
 def reject_outliers(data, m=2):
     return data[abs(data - np.mean(data)) < m * np.std(data)]
 
+        # Check position of car against center of lane
+def checkpos(lanecenter, threshold = 0, imXCenter = 270):
+    leftbound = imXCenter - threshold
+    rightbound = imXCenter + threshold
+    if lanecenter > rightbound or lanecenter < leftbound:
+        return (lanecenter - imXCenter)
+    else:
+        return 0
+
 # Begin timing
 start_time = time.time()
 
 # Read video
-cap = cv2.VideoCapture('sample03-mac.mov')
+cap = cv2.VideoCapture(-1)
 
 while cap.isOpened():
 
@@ -113,7 +124,7 @@ while cap.isOpened():
             # apply Otsu and Binary thresholding
             ret, thresh = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
-            im2, contours, hierarchy = cv2.findContours(thresh, 1, 2)
+            contours, hierarchy = cv2.findContours(thresh, 1, 2)
 
             # cv2.drawContours(frame, contours, -1, (0, 255, 0), 3)
             # cv2.imshow("contours", frame)
@@ -230,6 +241,13 @@ while cap.isOpened():
 
     # Coordinates of center of lane
     midlinex = (line1x + line2x)/2
+    
+    print "bob's wife", midlinex
+    offset = 0
+    if midlinex.shape[0] != 0:
+        offset = checkpos(midlinex[0])
+        
+
 
     slopes = []
 
@@ -238,9 +256,10 @@ while cap.isOpened():
         slopes.append(m)
 
     slopes = np.asarray(slopes)
-    print slopes
+    
 
     slope = 0.000000001
+
     if len(slopes) != 0:
         slope = np.mean(slopes)
 
@@ -255,10 +274,27 @@ while cap.isOpened():
     except Exception:
         angle = 90
 
-    scale = 1.411
-
-    driver.sendData(int(angle*scale))
-
+    scale = 3*1.411
+    i2c = smbus.SMBus(1)
+    DEVICE_ADDRESS = 0x0a
+    #driver.sendData(int(angle*scale))
+    print "Bob's second wife", type(int(angle*scale))
+    print "not bob's child", type(offset)
+    print "bob's secret child", offset
+    turn_offset = -(int(angle*scale) + offset)/2
+    if turn_offset > 127:
+        turn_offset = 127
+    if turn_offset < -127:
+        turn_offset = -127
+    # Register write control commands
+    # Initializing byte 99
+    i2c.write_byte(DEVICE_ADDRESS, 99)
+    # vCom setting forward drive (0-255)
+    i2c.write_byte(DEVICE_ADDRESS, 75)
+    # sCom setting steering (127 (standby), 126-0(max) left, 128-255(max) right)
+    i2c.write_byte(DEVICE_ADDRESS, 127 - turn_offset)
+    #time.sleep(0.1)
+    #127 - int(angle*scale)
     print "slope: ", slope
     print "angle: ", angle
 
@@ -309,24 +345,20 @@ while cap.isOpened():
 
     # show the combined image
     cv2.imshow("processed", newframe)
-    cv2.waitKey(200)
+    cv2.waitKey(10)
 
     # print len(frames)
 
-    '''
+   
 
         # Find center of lane
-        xpts = [x1, x2]
-        xavg = np.mean(xpts)  # x-coordinate of center of lane
+        # xpts = [x1, x2]
+        # xavg = np.mean(xpts)  # x-coordinate of center of lane
 
 
-        # Check position of car against center of lane
-        def checkpos(lanecenter, threshold):
-            leftbound = imXCenter - threshold
-            rightbound = imXCenter + threshold
-            if lanecenter > rightbound or lanecenter < leftbound:
-                adjust(lanecenter - imXCenter)
 
+        
+'''
 
         # Make adjustment
         def adjust(offset):
@@ -351,8 +383,7 @@ print droppedframes
 
 # print "total frames %s" %(totalframes)
 
-print
-print imHeight
+
 
 cap.release()
 cv2.destroyAllWindows()
