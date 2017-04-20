@@ -66,7 +66,7 @@ start_time = time.time()
 
 # Read video
 cap = cv2.VideoCapture(-1)
-
+previous_turn = 0;
 while cap.isOpened():
 
     __, image = cap.read()
@@ -177,7 +177,6 @@ while cap.isOpened():
                     line2.append([cpoint])
                     line2x.append(cX)
                     line2y.append(cY + slice * chunk)
-
                 # cv2.circle(frame, (cX, cY), 7, (255, 255, 255), -1)
                 cv2.putText(frame, "center", (cX - 20, cY - 20),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
@@ -273,15 +272,22 @@ while cap.isOpened():
         bob = angle - 5
     except Exception:
         angle = 90
-
     scale = 3*1.411
+    turn_offset = -(int(angle*scale) + offset)/2
+    if line1y.shape[0] == 0 or line1x.shape[0] == 0:
+        turn_offset = -previous_turn
+        print "bob's secret wife", turn_offset
+    if line2y.shape[0] == 0 or line2x.shape[0] == 0:
+        turn_offset = -previous_turn
+        print "bob's secret husband", turn_offset
+    
     i2c = smbus.SMBus(1)
     DEVICE_ADDRESS = 0x0a
     #driver.sendData(int(angle*scale))
     print "Bob's second wife", type(int(angle*scale))
     print "not bob's child", type(offset)
     print "bob's secret child", offset
-    turn_offset = -(int(angle*scale) + offset)/2
+    
     if turn_offset > 127:
         turn_offset = 127
     if turn_offset < -127:
@@ -295,6 +301,7 @@ while cap.isOpened():
     i2c.write_byte(DEVICE_ADDRESS, 127 - turn_offset)
     #time.sleep(0.1)
     #127 - int(angle*scale)
+    previous_turn = turn_offset
     print "slope: ", slope
     print "angle: ", angle
 
