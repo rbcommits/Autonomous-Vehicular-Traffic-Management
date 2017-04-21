@@ -8,13 +8,18 @@ maxVelocity = 1
 # SIMULATION VALUES
 timeInterval = 1
 simluationTime = 3000
-carGenerationModulo = 50
+carGenerationModulo = 60
 
 # INTERSECTION VALUES
 intersection_length = 40
 intersection_width = 40
 intersection_posX = 490
 intersection_posY = 490
+
+intersection2_length = 40
+intersection2_width = 40
+intersection2_posX = 1020
+intersection2_posY = 490
 
 
 # CONVENTIONAL VALUES

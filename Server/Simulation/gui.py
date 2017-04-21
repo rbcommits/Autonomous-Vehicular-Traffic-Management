@@ -16,20 +16,8 @@ class carGUI:
         self.canv = Canvas(master)
         self.canv.pack(fill='both', expand=True)
 
-        # Initialize X-Lane
-        self.xTop = self.canv.create_line(0, 470, 1000, 470, fill='black', tags=('top'))
-        self.xBottom = self.canv.create_line(0, 510, 1000, 510, fill='black', tags=('left'))
-
-        # Initialize Y-Lane
-        self.yLeft = self.canv.create_line(470, 0, 470, 1000, fill='blue', tags='right')
-        self.yRight = self.canv.create_line(510, 0, 510, 1000, fill='blue', tags='bottom')
-
-        # Highlight Intersection
-        self.rect = self.canv.create_rectangle(470, 470, 510, 510, fill='green')
-
-        # Show Regulation Lines
-        self.xLimit = self.canv.create_line(470 - 40, 450, 470 - 40, 530, fill="red")
-        self.yLimit = self.canv.create_line(450, 470 - 40, 530, 470 - 40, fill="red")
+        # Call Drawing functions
+        self.drawLanes()
 
         # Create button to begin simulation
         b = Button(text="Start Simluation!", command=self.simClickListener)
@@ -44,14 +32,20 @@ class carGUI:
         self.carDisplayX = self.canv.create_text(10, 10, anchor="nw", fill="red")
         self.carDisplayY = self.canv.create_text(600, 10, anchor="nw", fill="black")
 
-    def drawCar(self, lane, ID):
+    def drawCar(self, lane, ID, dirNumber):
 
+        # If this a horizontally travelling car draw it
         if(lane == 1):
-            # Draw an X car
             self.rect = self.canv.create_rectangle(0, 485, 10, 495, fill='black')
-        elif(lane == 2):
-            # Draw a Y car
+
+        # This is a vertically travelling car in the first lane
+        elif(lane == 2 and dirNumber == 0):
             self.rect = self.canv.create_rectangle(485, 0, 495, 10, fill='red')
+
+        # This is a vertically travelling car in the second lane
+        elif(lane == 2 and dirNumber == 1):
+            self.rect = self.canv.create_rectangle(1015, 0, 1025, 10, fill='red')
+
 
         self.canv.addtag_below(self.rect, "HELLO")
 
@@ -73,6 +67,8 @@ class carGUI:
 
     def highlightCar(self, car, color):
         self.canv.itemconfig(self.carDict[car.ID], fill=color)
+        self.master.update_idletasks()
+
 
     def simClickListener(self):
         from Simulation import simulation as sim
@@ -88,3 +84,26 @@ class carGUI:
 
         else:
             self.canv.itemconfig(self.carDisplayY, text=carData)
+
+    def drawLanes(self):
+
+        # Initialize X-Lane
+        self.xTop = self.canv.create_line(0, 470, 10000, 470, fill='black', tags=('top'))
+        self.xBottom = self.canv.create_line(0, 510, 10000, 510, fill='black', tags=('left'))
+
+        # Initialize first Y-Lane
+        self.yLeft = self.canv.create_line(470, 0, 470, 10000, fill='blue', tags='right')
+        self.yRight = self.canv.create_line(510, 0, 510, 10000, fill='blue', tags='bottom')
+
+        # Initialize second Y - Lane
+        self.yLeft = self.canv.create_line(1000, 0, 1000, 10000, fill='blue', tags='right')
+        self.yRight = self.canv.create_line(1040, 0, 1040, 10000, fill='blue', tags='bottom')
+
+    def drawIndicationLines(self, Intersection):
+
+        # Draw the entrance lines
+        self.entranceX = self.canv.create_line(Intersection.positionX - Intersection.width, Intersection.positionY - Intersection.length, Intersection.positionX - Intersection.width, Intersection.positionY + Intersection.length, fill="red")
+        self.entranceX = self.canv.create_line(Intersection.positionX - Intersection.width, Intersection.positionY - Intersection.length, Intersection.positionX + Intersection.width, Intersection.positionY - Intersection.length, fill="red")
+
+        # Paint the intersection
+        self.rect = self.canv.create_rectangle(Intersection.positionX - Intersection.width / 2, Intersection.positionY - Intersection.length / 2, Intersection.positionX + Intersection.width / 2, Intersection.positionY + Intersection.length / 2, fill="green")

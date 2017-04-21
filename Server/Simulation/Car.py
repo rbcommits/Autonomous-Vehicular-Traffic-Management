@@ -19,6 +19,11 @@ class Car:
         self.startTime = startTime      # This is the cars stamped time. We must monitor how much time the car spends inside calculations as well
         self.timeStamped = False
 
+        """ The regulation flag informs the system if the car is currently being regulated by the intersection management module. Once it is released we can bump
+        the car up to maximum speed, otherwise it is untouchable. It is false by default """
+        self.regulationFlag = False
+        self.intersectionFlag = False
+
     # Print all details of car instance
     def displayCar(self):
         print ("Length: " + self.length)
@@ -52,3 +57,6 @@ class Car:
     def updateAcceleration(self, newVelocityX, newVelocityY):
         self.accelerationX = newVelocityX - self.velocityX
         self.accelerationY = newVelocityY - self.velocityY
+
+    def getPosition(self):
+        return(self.direction + ": (" + str(self.positionX) + ", " + str(self.positionY) + ")")
