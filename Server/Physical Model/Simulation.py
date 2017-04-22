@@ -6,13 +6,13 @@ from gui import carGUI
 from random import randint
 from Car import Car
 from Intersection import Intersection
+
+#from values import carList as carList
 # import server
 # import client
 
 # Initialize array to contain cars
-carList = []
-
-
+carList = values.carList
 def simulation(gui):
     # Initialize instance of intersection
     currIntersection = Intersection(length=40, wid=40, posX=490, posY=490)
@@ -23,13 +23,9 @@ def simulation(gui):
     # Begin simulation:
     while(runSim):
 
-        # Determine what kind of simulation we're running
-        if(gui.CheckVar.get() == 1):
-            values.conventionalSimFlag = True
-        else:
-            values.conventionalSimFlag = False
+        print("Top of the loop")
 
-        # Remove processed cars from the intersection list
+        # Remove processed cars rom the intersection list
         cleanList(carList, gui, currIntersection)
 
         # Check to see if we should end simulation
@@ -51,14 +47,19 @@ def simulation(gui):
         # Update the positions of the cars
         update_positions(gui)
 
-        # Generate new cars
-        # generate_cars(gui, elapsedTime)
+        # Sleep the while loop with custom spinlock.
+        now = time.time()
+        while(time.time() - now <= (0.1)):
+            i = 1
 
-        # Call server communications
-        # server_send_packet()
 
-        # Sleep the while loop
-        time.sleep(.01)
+
+
+        print("Bottom of Loop")
+
+
+
+
 
     generate_statistics()
 
@@ -179,13 +180,11 @@ def randomCarGenerator(LiveGUI, twoCars, Direction):
     if(direction == 1):
         # Generate a vertically traveling car
         car = Car(length=5, width=5, velocityX=velocity, velocityY=0, startX=0, startY=0, ID=ID, direction="vertical", startTime=time.time())
-        server_receive_packet(car)
         LiveGUI.drawCar(direction, ID)
 
     elif(direction == 2):
         # Generate a vertically traveling car
         car = Car(length=5, width=5, velocityX=0, velocityY=velocity, startX=0, startY=0, ID=ID, direction="horizontal", startTime=time.time())
-        server_receive_packet(car)
         LiveGUI.drawCar(direction, ID)
 
     '''
@@ -250,40 +249,18 @@ def cleanList(carList, gui, currIntersection):
 
 
 def update_car_delay(time):
-    # timeStart = time.time()         # TIME START
-
     for i in range(0, len(carList)):
         carList[i].calculationTime += time
 
-    # timeEnd = time.time()           # TIME END
-
-    # Call the delay update function
-    # update_car_delay((timeEnd - timeStart))
-
 
 def receiveCar(car):
+    print("RECEIVED CAR")
+    raw_input(car)
     carList.append(car)
+    GUI.drawCar(car, car.ID)
 
 
-'''
-def server_send_packet():
-    print("server comm")
-    msg = []
-
+def printAllCars():
     for i in range(0, len(carList)):
-
-        msg.append(carList[i].velocityX)
-        msg.append(carList[i].velocityY)
-        msg.append(carList[i].positionX)
-        msg.append(carList[i].positionY)
-        print("msg created")
-        server.simulate(carList[i].ID, msg)
-        print("return from server")
-'''
-
-
-def server_receive_packet(car):
-    # server.update_queue((1, car))
-    print("I HAVE LEFT")
-    # client.newCar(car)
-    print("I HAVE RETURNED")
+        carList[i].displayCar()
+        input()

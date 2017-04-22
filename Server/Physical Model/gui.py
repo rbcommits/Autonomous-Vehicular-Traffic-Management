@@ -1,5 +1,6 @@
 # GUI
 from tkinter import Canvas, Button, Checkbutton, IntVar
+import _thread as thread
 import values
 
 
@@ -9,6 +10,7 @@ class carGUI:
     carIDs = []
 
     def __init__(self, master):
+
         self.master = master
         master.title("A simple GUI")
 
@@ -35,14 +37,24 @@ class carGUI:
         b = Button(text="Start Simluation!", command=self.simClickListener)
         b.pack()
 
+
+        '''
         # Create checkbox to differentiate real world sim from autonomous sim
         self.CheckVar = IntVar()
         self.checkConventional = Checkbutton(text="Conventional System", variable=self.CheckVar, onvalue=1, offvalue=0, height=5)
         self.checkConventional.pack()
+        '''
 
         # Create text fields to show first in queue cars
         self.carDisplayX = self.canv.create_text(10, 10, anchor="nw", fill="red")
         self.carDisplayY = self.canv.create_text(600, 10, anchor="nw", fill="black")
+
+        from Simulation import simulation as sim
+        global simulation
+        simulation = thread.start_new_thread(sim, (self,))
+        # simulation = sim(self)
+        print("WE CAME BACK FROM SIMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM")
+        # thread.start_new_thread(sim, (self,))
 
     def drawCar(self, lane, ID):
 
@@ -62,10 +74,9 @@ class carGUI:
 
     def moveCars(self, carList, timeInterval):
 
-        self.master.update_idletasks()  # THIS UPDATES THE GUI
-
         for i in range(0, len(carList)):
             self.canv.move(self.carDict[carList[i].ID], carList[i].velocityX * timeInterval, carList[i].velocityY * timeInterval)
+            self.master.update_idletasks()  # THIS UPDATES THE GUI
 
     def moveCar(self, car, timeInterval):
         self.master.update_idletasks()
@@ -76,7 +87,8 @@ class carGUI:
 
     def simClickListener(self):
         from Simulation import simulation as sim
-        sim(self)
+        global simulation
+        simulation = sim(self)
 
     def updateCarInformationDisplay(self, car):
         carData = "position X = " + str(car.positionX) + "\nposition Y = " + \
@@ -88,3 +100,9 @@ class carGUI:
 
         else:
             self.canv.itemconfig(self.carDisplayY, text=carData)
+
+    def receiveCar(self, newCar):
+        self.drawCar(newCar, newCar.ID)
+        values.carList.append(newCar)
+        print("received car")
+        

@@ -15,9 +15,9 @@ class Car:
         self.positionY = startY         # Y start coordinate
         self.ID = ID                    # Give car unique ID
         self.waiting = False            # Set the waiting attribute to false
-        self.direction = direction
+        self.direction = direction      # Give the car its directiion
         self.startTime = startTime      # This is the cars stamped time. We must monitor how much time the car spends inside calculations as well
-        self.timeStamped = False
+        self.timeStamped = False        # This attribute is used to detect if a car has been stamped yet
 
     # Print all details of car instance
     def displayCar(self):

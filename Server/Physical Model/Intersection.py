@@ -33,22 +33,6 @@ class Intersection:
                     carList[i].intersectionTimeStamp = time  # Stamp the arrival time
                     self.queueY.put(carList[i])              # Place car in queue to be regulated
 
-            '''
-            if(carList[i].velocityX != values.maxVelocity and carList[i].velocityX > 0 and carList[i].positionX > self.positionX + 80):
-                # We must adjust this x car to max velocity it has left the interscetion
-                carList[i].velocityX = values.maxVelocity
-                carList[i].displayCar()
-                gui.highlightCar(carList[i], "green")
-                print "ADJUSTING X VEL"
-                return
-
-            if(carList[i].velocityY != values.maxVelocity and carList[i].velocityY > 0):
-                # We must adjust this y car to max velocity it has left the interscetion
-                carList[i].velocityY = values.maxVelocity
-                gui.highlightCar(carList[i], "green")
-                print "ADJUSTING Y VEL"
-                return
-            '''
     def restoreVelocities(self, carList):
 
         for i in range(0, len(carList)):

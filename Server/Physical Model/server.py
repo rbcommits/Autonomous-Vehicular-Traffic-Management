@@ -4,10 +4,15 @@ import threading
 import time
 import Car
 from queue import *
-# import Queue
+import Simulation
+from tkinter import Tk
+from gui import carGUI
 import zlib, pickle as pickle
+import _thread as thread
+import values
 
 PORT = 'tcp://*:5570'   # change this to whatever port you want your server to run on
+
 """
  Server code for the Atuonomous Car system.
  Accepts a data packet of the format {[length], [linear velocity, angular velocity]} from cars in range
@@ -94,12 +99,10 @@ server_workers = []
 car_queue = Queue()         # feel free to change the name! I just needed a dummy placeholder to send messages back lol
 velocity_queue = Queue()
 
-
 def tprint(msg):
     """like print, but won't get newlines confused with multiple threads"""
     sys.stdout.write(msg + '\n')
     sys.stdout.flush()
-
 
 
 class Car:
@@ -187,9 +190,10 @@ def simulate(ID, msg):
     worker.worker.send_multipart([ID, msg])
 
 
-def update_queue(object):
-    print("OBJECT TUPLE = ", object)
-    car_queue.put(object)
+def update_queue(myObj):
+   # print("OBJECT TUPLE = ", object)
+    print("UPDATED QUEUE")
+    values.gui.receiveCar(myObj)
     # simulate()
 
 
@@ -214,6 +218,7 @@ class ServerTask(threading.Thread):
 
         global server_workers
         for i in range(5):
+            print("Spinning up worker")
             worker = ServerWorker(context, i)           # i will be the unique worker ID
             worker.start()
             server_workers.append(worker)
@@ -223,7 +228,6 @@ class ServerTask(threading.Thread):
         frontend.close()
         backend.close()
         context.term()
-
 
 class ServerWorker(threading.Thread):
     """ServerWorker"""
@@ -239,7 +243,7 @@ class ServerWorker(threading.Thread):
         while True:
             ID, msg = self.worker.recv_multipart()
             msg = deserialize(msg)
-            tprint('Worker received %s from %s' % (msg, ID))
+            tprint('Worker received %s from %s' % (msg.velocityX, ID))
 
             # Add to queue here (both ID and message as an object)
             # or update queue if car ID already exixts
@@ -248,17 +252,15 @@ class ServerWorker(threading.Thread):
             # worker to send the updated velocity back
             car = Car(length=msg.length, width=msg.width, velocityX=msg.velocityX, velocityY=msg.velocityY, startX=msg.positionX, startY=msg.positionY, ID=msg.ID, direction=msg.direction, startTime=msg.startTime)
             update_queue(car)
-            #  car_queue.queue(car)
-            # somequeue.queue(car)
             # worker.send_multipart([ID, msg])
 
         self.worker.close()
 
 
-'''
 # def main_func():
-if __name__ == "__main__":
-    server = ServerTask()
-    server.start()
-    server.join()
-'''
+# if __name__ == "__main__":
+    # dan = ServerTask()
+    #s.server = ServerTask()
+    # thread.start_new_thread(dan.start,())
+
+
