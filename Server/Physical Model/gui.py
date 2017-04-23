@@ -51,7 +51,7 @@ class carGUI:
 
         from Simulation import simulation as sim
         global simulation
-        simulation = thread.start_new_thread(sim, (self,))
+        self.simulation = thread.start_new_thread(sim, (self,))
         # simulation = sim(self)
         print("WE CAME BACK FROM SIMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM")
         # thread.start_new_thread(sim, (self,))

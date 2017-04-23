@@ -13,6 +13,8 @@ from Intersection import Intersection
 
 # Initialize array to contain cars
 carList = values.carList
+
+
 def simulation(gui):
     # Initialize instance of intersection
     currIntersection = Intersection(length=40, wid=40, posX=490, posY=490)
@@ -50,16 +52,9 @@ def simulation(gui):
         # Sleep the while loop with custom spinlock.
         now = time.time()
         while(time.time() - now <= (0.1)):
-            i = 1
-
-
-
+            pass
 
         print("Bottom of Loop")
-
-
-
-
 
     generate_statistics()
 

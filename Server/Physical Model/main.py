@@ -8,8 +8,8 @@ import _thread as thread
 import values
 
 if __name__ == "__main__":
-	root = Tk()
-	values.init(root)
-	server = server.ServerTask()
-	thread.start_new_thread(server.start, ())
-	root.mainloop()
+    root = Tk()
+    values.init(root)
+    server = server.ServerTask()
+    thread.start_new_thread(server.start, ())
+    root.mainloop()

@@ -36,6 +36,7 @@ conventional_times = []					# Container for the time spent in an intersection fo
 optimized_calculation_times = []		# Times a optimized vehicle runs in the intersection
 conventional_calculation_times = []		# Times a conventional vehicle spends in an intersection
 
+
 def init(root):
-	global gui
-	gui = carGUI(root)
+    global gui
+    gui = carGUI(root)
