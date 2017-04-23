@@ -3,13 +3,9 @@ import sys
 import threading
 import time
 from Car import Car
-from queue import *
-import Simulation
-from tkinter import Tk
-from gui import carGUI
+from Queue import *
+# import Queue
 import zlib, pickle as pickle
-import _thread as thread
-import values
 import signal
 
 PORT = 'tcp://*:5570'   # change this to whatever port you want your server to run on
@@ -26,20 +22,16 @@ def tprint(msg):
     sys.stdout.flush()
 
 
+
+
+
 def simulate(ID, msg):
     # start simulation here
-    print("server simulate")
 
-    # Simulation done, final velocities calculated
-    # time to send data back to the car
-    # To make this program work, I set velocity_queue = car_queue so the workers have something to send back
-    # but in general, velocity queue should be filled up by the algorithm and then the workers can pull from it and send data back
-
-    print("server velocity queue")
     velocity_queue = car_queue                      # remove this once you start populating this queue via the algorithm
-    print("Get velocity queue")
+
     worker_ID, car = velocity_queue.get()
-    print("allocate worker object")
+
     worker = object()
 
     print("server for loop")
@@ -56,15 +48,11 @@ def simulate(ID, msg):
     worker.worker.send_multipart([ID, msg])
 
 
-def update_queue(myObj):
-    print("UPDATED QUEUE")
-    values.gui.receiveCar(myObj)
-    values.gui.simulation.carList.append(myObj)
-    send_response(1) # send 1 as dummy velociity
-    
-def send_response(msg):
-    worker = object()
-    worker.worker.send_multipart([1, msg])
+def update_queue(object):
+    print("OBJECT TUPLE = ", object)
+    car_queue.put(object)
+    # simulate()
+
 
 def deserialize(msg):
     """inverse of send_zipped_packet"""
@@ -87,7 +75,6 @@ class ServerTask(threading.Thread):
 
         global server_workers
         for i in range(5):
-            print("Spinning up worker")
             worker = ServerWorker(context, i)           # i will be the unique worker ID
             worker.start()
             server_workers.append(worker)
@@ -113,25 +100,27 @@ class ServerWorker(threading.Thread):
         while True:
             ID, msg = self.worker.recv_multipart()
             msg = deserialize(msg)
-            tprint('Worker received %s from %s' % (msg.velocityX, ID))
+
 
             # Add to queue here (both ID and message as an object)
             # or update queue if car ID already exixts
 
             # We include the ID of the worker who received the request so we can later use the same
             # worker to send the updated velocity back
-            car = msg
             #car = Car(length=msg.length, width=msg.width, velocityX=msg.velocityX, velocityY=msg.velocityY, startX=msg.positionX, startY=msg.positionY, ID=msg.ID, direction=msg.direction, startTime=msg.startTime)
-            update_queue(car)
+            #update_queue(car)
+            print "got data from client: ", msg.in_intersection
+            #  car_queue.queue(car)
+            # somequeue.queue(car)
             # worker.send_multipart([ID, msg])
 
         self.worker.close()
 
 
+
 # def main_func():
-# if __name__ == "__main__":
-    # dan = ServerTask()
-    #s.server = ServerTask()
-    # thread.start_new_thread(dan.start,())
-
-
+if __name__ == "__main__":
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
+    server = ServerTask()
+    server.start()
+    server.join()
