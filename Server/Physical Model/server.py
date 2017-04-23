@@ -126,7 +126,5 @@ class ServerWorker(threading.Thread):
 # def main_func():
 # if __name__ == "__main__":
     # dan = ServerTask()
-    #s.server = ServerTask()
+    # s.server = ServerTask()
     # thread.start_new_thread(dan.start,())
-
-
