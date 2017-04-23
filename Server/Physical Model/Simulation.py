@@ -17,7 +17,7 @@ carList = values.carList
 
 def simulation(gui):
     # Initialize instance of intersection
-    currIntersection = Intersection(length=40, wid=40, posX=490, posY=490)
+    currIntersection = Intersection(length=40, wid=40, posX=490, posY=490, gui=gui)
 
     elapsedTime = 0                                         # initialize time in seconds
     runSim = True                                           # bool to stop simulation
@@ -36,7 +36,7 @@ def simulation(gui):
         elapsedTime += values.timeInterval                  # increment 100 mili second
 
         # Update the intersection containers and values
-        update_intersection(currIntersection, elapsedTime, gui)
+        update_intersection(currIntersection, elapsedTime)
 
         # Check if this is a conventional simulation
         if(values.conventionalSimFlag):
@@ -44,7 +44,7 @@ def simulation(gui):
 
         # Check if this is an optimized simulation
         else:
-            run_optimized(currIntersection, gui)
+            run_optimized(currIntersection, gui, carList)
 
         # Update the positions of the cars
         update_positions(gui)
@@ -55,14 +55,13 @@ def simulation(gui):
             pass
 
         print("Bottom of Loop")
-
     generate_statistics()
 
 
-def run_optimized(intersection, gui):
+def run_optimized(intersection, gui, carList):
     timeStart = time.time()             # START TIME
 
-    Calculations.collisionDetection(intersection.queueX, intersection.queueY, gui)
+    Calculations.collisionDetection(intersection.queueX, intersection.queueY, gui, intersection, carList)
 
     timeEnd = time.time()
 
@@ -80,10 +79,10 @@ def run_conventional(intersection, gui):
     update_car_delay((timeEnd - timeStart))
 
 
-def update_intersection(intersection, elapsedTime, gui):
+def update_intersection(intersection, elapsedTime):
         timeStart = time.time()         # START TIME
 
-        intersection.updateIntersectionQueues(carList, elapsedTime, gui)
+        intersection.updateIntersectionQueues(carList, elapsedTime)
         intersection.restoreVelocities(carList)
 
         timeEnd = time.time()           # END TIME
