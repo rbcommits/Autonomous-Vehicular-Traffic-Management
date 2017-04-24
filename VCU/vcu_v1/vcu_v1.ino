@@ -42,8 +42,7 @@ void setup() {
   pinMode(vSen, INPUT);
   pinMode(mPinFwdA, OUTPUT);
   pinMode(mPinFwdB, OUTPUT);
-  analogWrite(mPinFwdA, 0);
-  mSpeedSet = 1500;
+  mSpeedSet = 0;
   mPID.SetMode(AUTOMATIC);
 }
 
@@ -69,10 +68,10 @@ void vSenUpdate() {
 
 void pidUpdate() {
   mSpeedAct = vSenSpeed;
-  mPID.Compute();
   mDriveSet();
   mDriveCmd();
   sDriveCmd();
+  mPID.Compute();
 }
 
 void mDriveSet() {
@@ -80,18 +79,13 @@ void mDriveSet() {
 }
 
 void mDriveCmd() {
-  if (mSpeedPwm <= vComPwmMax) {
-    analogWrite(mPinFwdA, mSpeedPwm);
-  } else {
-    analogWrite(mPinFwdA, vComPwmMax);
-  }
-  /*
-  if (mSpeedPwm <= vComPwmMax) {
+  if (mSpeedPwm <= vComPwmMax && vCom != 0) {
     analogWrite(mPinFwdB, mSpeedPwm);
-  } else {
+  } else if(mSpeedPwm != 0 && vCom != 0) {
     analogWrite(mPinFwdB, vComPwmMax);
+  } else {
+    analogWrite(mPinFwdB, 0);
   }
-  */
 }
 
 void sDriveCmd() {
@@ -123,22 +117,22 @@ void i2c_recv(int length) {
       Serial.print("sCom receive: ");
       Serial.println(sCom);
     }
-    
+
     if (i2cIndex == 1) {
       i2cIndex = 2;
       vCom = c;
       Serial.print("vCom receive: ");
       Serial.println(vCom);
     }
-    
+
     if (c == 'c' || i2cIndex == 0) {
       i2cIndex = 1;
     }
   }
 }
 
-void watchDog(){
-  if(millis() > lastRecvTime + cmdTimeout){
+void watchDog() {
+  if (millis() > lastRecvTime + cmdTimeout) {
     vCom = 0;
     sCom = 127;
     analogWrite(sPinL, 0);
