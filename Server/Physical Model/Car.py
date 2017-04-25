@@ -15,33 +15,47 @@ class Car:
         self.positionY = startY         # Y start coordinate
         self.ID = ID                    # Give car unique ID
         self.waiting = False            # Set the waiting attribute to false
-        self.direction = direction      # Give the car its directiion
+        self.direction = direction
         self.startTime = startTime      # This is the cars stamped time. We must monitor how much time the car spends inside calculations as well
-        self.timeStamped = False        # This attribute is used to detect if a car has been stamped yet
+        self.timeStamped = False
+
+        """ The regulation flag informs the system if the car is currently being regulated by the intersection management module. Once it is released we can bump
+        the car up to maximum speed, otherwise it is untouchable. It is false by default """
+        self.regulationFlag = False
+        self.intersectionFlag = False
+        self.guiDeletedFlag = False
 
     # Print all details of car instance
     def displayCar(self):
-        print ("Length: " + self.length)
-        print ("Width: " + self.width)
-        print ("X Position: " + self.positionX)
-        print ("Y Position: " + self.positionY)
-        print ("X Velocity: " + self.velocityX)
-        print ("Y Velocity: " + self.velocityY)
-        print ("X Acceleration: " + self.accelerationX)
-        print ("Y Acceleration: " + self.accelerationY)
+        print("Length: " + self.length)
+        print("Width: " + self.width)
+        print("X Position: " + self.positionX)
+        print("Y Position: " + self.positionY)
+        print("X Velocity: " + self.velocityX)
+        print("Y Velocity: " + self.velocityY)
+        print("X Acceleration: " + self.accelerationX)
+        print("Y Acceleration: " + self.accelerationY)
 
     def displayPosition(self):
-        print ("(" + self.positionX + ", " + self.positionY, ")")
+        print("(" + self.positionX + ", " + self.positionY, ")")
 
     def displayVelocity(self):
-        print ("(" + self.velocityX + ", " +self.velocityY, ")")
+        print("(" + self.velocityX + ", " + self.velocityY, ")")
 
     def displayAcceleration(self):
-        print ("(" + self.accelerationX + ", " + self.accelerationX, ")")
+        print("(" + self.accelerationX + ", " + self.accelerationX, ")")
 
     def updatePosition(self, time):
         self.positionX = self.positionX + self.velocityX * time
         self.positionY = self.positionY + self.velocityY * time
+
+    def turn(self, time):
+        if(self.direction == "vertical"):
+            self.positionX = self.positionX + self.velocityX * time
+            self.positionY = self.positionY + self.velocityY * time
+        elif(self.direction == "horizontal"):
+            self.positionX = self.positionX + self.velocityX * time
+            self.positionY = self.positionY + self.velocityY * time
 
     # Calculate velocity
     def updateVelocity(self, newPositionX, newPositionY):
@@ -52,3 +66,6 @@ class Car:
     def updateAcceleration(self, newVelocityX, newVelocityY):
         self.accelerationX = newVelocityX - self.velocityX
         self.accelerationY = newVelocityY - self.velocityY
+
+    def getPosition(self):
+        return(self.direction + ": (" + str(self.positionX) + ", " + str(self.positionY) + ")")

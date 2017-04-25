@@ -4,34 +4,31 @@ import random
 
 carList = []
 
+
 def collisionDetection(queueX, queueY, gui, intersection, globalCarList):
-    
-    print("Length of queues: queuex = " + str(queueX._qsize()) + " queuey = " + str(queueY._qsize()))
 
     carList = globalCarList
 
     intersectionList = intersection.IntersectionList
 
     if(not queueX.empty() and not queueY.empty()):
-        print("There are cars in both queues")
         carX = queueX.get()     # attain x car enterint intersection
         carY = queueY.get()     # attain y car entering intersection
 
         intersectionList.append(carX)
         intersectionList.append(carY)
 
-
         # Now determine which car entered the inersection first
         if(abs(carX.positionX) < abs(carY.positionY)):
             # X is the first car
             gui.highlightCar(carY, "black")
-            slowCar(carSlow=carY, carFull=carX, slowY=True, intersection=intersection)
+            slowCar(carSlow=carY, carFull=carX, slowY=True, intersection=intersection, gui=gui)
             return
 
         elif(abs(carY.positionY) < abs(carX.positionX)):
             # Y is the first car
             gui.highlightCar(carX, "black")
-            slowCar(carSlow=carX, carFull=carY, slowY=False, intersection=intersection)
+            slowCar(carSlow=carX, carFull=carY, slowY=False, intersection=intersection, gui=gui)
             return
 
         else:
@@ -39,32 +36,28 @@ def collisionDetection(queueX, queueY, gui, intersection, globalCarList):
             """ Both cars have the same position on their relative axis """
             rollSlow = random.randint(1, 2)                     # Randomly decide which car to slow down
             if(rollSlow == 1):
-                slowCar(carSlow=carY, carFull=carX, slowY=True, intersection=intersection)
+                slowCar(carSlow=carY, carFull=carX, slowY=True, intersection=intersection, gui=gui)
                 return
             elif(rollSlow == 2):
-                slowCar(carSlow=carX, carFull=carY, slowY=False, intersection=intersection)
+                slowCar(carSlow=carX, carFull=carY, slowY=False, intersection=intersection, gui=gui)
                 return
 
     # If the cars in the queue and past the intersection without being regulated yet pop it
     # We dont need it
     elif(not queueX.empty()):
-        print("There is only a car in the X queue")
         carX = queueX.get()
         intersectionList.append(carX)
         """ We must make sure the intersection is safe to fly through! """
-        checkSafePassage(car=carX, intersection=intersection)
-
+        checkSafePassage(car=carX, intersection=intersection, gui=gui)
 
     elif(not queueY.empty()):
-        print("There is only a car in the Y queue")
         carY = queueY.get()
         intersectionList.append(carY)
         """ We must make sure the intersection is safe to fly through! """
-        checkSafePassage(car=carY, intersection=intersection)
+        checkSafePassage(car=carY, intersection=intersection, gui=gui)
 
 
-""" Function to reduce velocity of a car """
-def slowCar(carSlow, carFull, slowY, intersection):
+def slowCar(carSlow, carFull, slowY, intersection, gui):
 
     ''' Both these cars are now untouchable by other parts of the program '''
     carSlow.regulationFlag = True
@@ -90,8 +83,9 @@ def slowCar(carSlow, carFull, slowY, intersection):
     carFull.regulationFlag = False
 
 """ Function to detect a possible collision """
-def collide(carX, carY, intersection):
-
+def collide(carX, carY, intersection, gui):
+    gui.highlightCar(carX, "green")
+    gui.highlightCar(carY, "green")
     # Create two copies of cars to test
     carTestX = copy.copy(carX)
     carTestY = copy.copy(carY)
@@ -102,7 +96,6 @@ def collide(carX, carY, intersection):
     # print("searching for good route")
 
     while(True):
-
         # print(str(carTestX.positionX) + " <= " + str(carTestY.positionX + 1) + " and " + str(carTestX.positionX) + " >= " + str(carTestY.positionX - 1))
         if(((carTestX.positionX <= carTestY.positionX + 10) and (carTestX.positionX >= carTestY.positionX - 10)) and 
             ((carTestX.positionY <= carTestY.positionY + 10) and (carTestX.positionY >= carTestY.positionY - 10))):
@@ -117,28 +110,25 @@ def collide(carX, carY, intersection):
         # if(((carTestX.positionX >= carTestY.positionX + 1) and (carTestX.positionX <= carTestY.positionX - 1)) or ((carTestX.positionY >= carTestY.positionY + 1) and (carTestX.positionY <= carTestY.positionY - 1))):
 
 
-def signalCongestion():
-    for i in range(len(carList)):
-        if(carList[i].direction == "vertical"):
-                carList[i].velocityY == carList[i].velocityY - 0.5
-        else:
-                carList[i].velocityX = carList[i].velocityX - 0.5
-    return
-
-def checkSafePassage(car, intersection):
+def checkSafePassage(car, intersection, gui):
 
     if(car.direction == "vertical"):
         while(True):
             if(collisionSingle(car=car, intersection=intersection)):
-                car.velocityY = car.velocityY - 0.1
+                car.velocityY = car.velocityY - 0.01
+                gui.highlightCar(car, "green")
             else:
+                # print(values.deaccelerate(car.velocityY))
                 break
     elif(car.direction == "horizontal"):
         while(True):
             if(collisionSingle(car=car, intersection=intersection)):
-                car.velocityX = car.velocityX - 0.1
+                car.velocityX = car.velocityX - 0.01
+                gui.highlightCar(car, "green")
             else:
+                # print(values.deaccelerate(car.velocityX))
                 break
+
 
 def collisionSingle(car, intersection):
     testCar = copy.copy(car)
@@ -146,24 +136,20 @@ def collisionSingle(car, intersection):
 
     for i in range(len(intersection.IntersectionList)):
         if(car == intersection.IntersectionList[i]):
-            print("found its copy")
             continue
         else:
             copyList.append(copy.copy(intersection.IntersectionList[i]))
 
     while(True):
-        print("looping")
-
-        if(copyList):
+        if(len(copyList) != 0):
             for i in range(len(copyList)):
-                print(copyList)
-                if(((testCar.positionX <= copyList[i].positionX + 11) and (testCar.positionX >= copyList[i].positionX - 11)) and 
-                    ((testCar.positionY <= copyList[i].positionY + 11) and (testCar.positionY >= copyList[i].positionY - 11))):
+                if(((testCar.positionX <= copyList[i].positionX + 11) and (testCar.positionX >= copyList[i].positionX - 11)) and
+                   ((testCar.positionY <= copyList[i].positionY + 11) and (testCar.positionY >= copyList[i].positionY - 11))):
                     return True
 
-                if(testCar.direction == "vertical" and testCar.positionY > intersection.positionY + intersection.length):
-                    return False
                 if(testCar.direction == "horizontal" and testCar.positionX > intersection.positionX + intersection.width):
+                    return False
+                if(testCar.direction == "vertical" and testCar.positionY > intersection.positionY + intersection.length):
                     return False
 
             for i in range(len(copyList)):

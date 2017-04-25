@@ -21,7 +21,7 @@ class Intersection:
         ''' Iterate through the list of all cars in the intersection radius '''
         for i in range(0, len(carList)):
             ''' If the car is within the inner radius then it must me marked to be regulated '''
-            if(carList[i].positionX >= self.positionX - self.width and carList[i].positionX <= self.positionX and 
+            if(carList[i].positionX >= self.positionX - self.width * 8 and carList[i].positionX <= self.positionX and 
                 carList[i].direction == "horizontal" and carList[i].positionY >= self.positionY - self.length and
                 carList[i].positionY <= self.positionY + self.length):
 
@@ -33,7 +33,7 @@ class Intersection:
                     carList[i].intersectionTimeStamp = time   # Stamp the arrival time
                     self.queueX.put(carList[i])               # Place car in queue to be regulated
 
-            if(carList[i].positionY >= self.positionY - self.length and carList[i].positionY <= self.positionY and
+            if(carList[i].positionY >= self.positionY - self.length * 8 and carList[i].positionY <= self.positionY and
              carList[i].direction == "vertical" and carList[i].positionX >= self.positionX - self.width and
               carList[i].positionX <= self.positionX + self.width):
 

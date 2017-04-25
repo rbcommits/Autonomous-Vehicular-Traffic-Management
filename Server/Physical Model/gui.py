@@ -102,7 +102,12 @@ class carGUI:
             self.canv.itemconfig(self.carDisplayY, text=carData)
 
     def receiveCar(self, newCar):
-        self.drawCar(newCar, newCar.ID)
-        values.carList.append(newCar)
+        if(newCar.direction == "vertical"):
+            print("vertical")
+            self.drawCar(2, newCar.ID)
+
+        elif(newCar.direction == "horizontal"):
+            print("horizontal")
+            self.drawCar(1, newCar.ID)
+
         print("received car")
-        

@@ -123,7 +123,7 @@ def process_done_waiting(gui, queueX, queueY):
 
     elif(not queueDoneWaitingY.empty()):
         print("ELIF Y NOT EMPTY")
-        print("STOPPEDX = " + values.conventionalStoppedX + " STOPPED Y = " + values.conventionalStoppedY)
+        print("STOPPEDX = " + str(values.conventionalStoppedX) + " STOPPED Y = " + str(values.conventionalStoppedY))
         # time.sleep(1)
 
         carY = queueDoneWaitingY.get()
@@ -133,7 +133,6 @@ def process_done_waiting(gui, queueX, queueY):
         values.conventionalStoppedY = False
 
     return
-
 
 def move_lane(car, gui, queueX, queueY):
 

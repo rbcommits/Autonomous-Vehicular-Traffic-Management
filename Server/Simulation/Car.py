@@ -23,30 +23,39 @@ class Car:
         the car up to maximum speed, otherwise it is untouchable. It is false by default """
         self.regulationFlag = False
         self.intersectionFlag = False
+        self.guiDeletedFlag = False
 
     # Print all details of car instance
     def displayCar(self):
-        print ("Length: " + self.length)
-        print ("Width: " + self.width)
-        print ("X Position: " + self.positionX)
-        print ("Y Position: " + self.positionY)
-        print ("X Velocity: " + self.velocityX)
-        print ("Y Velocity: " + self.velocityY)
-        print ("X Acceleration: " + self.accelerationX)
-        print ("Y Acceleration: " + self.accelerationY)
+        print("Length: " + self.length)
+        print("Width: " + self.width)
+        print("X Position: " + self.positionX)
+        print("Y Position: " + self.positionY)
+        print("X Velocity: " + self.velocityX)
+        print("Y Velocity: " + self.velocityY)
+        print("X Acceleration: " + self.accelerationX)
+        print("Y Acceleration: " + self.accelerationY)
 
     def displayPosition(self):
-        print ("(" + self.positionX + ", " + self.positionY, ")")
+        print("(" + self.positionX + ", " + self.positionY, ")")
 
     def displayVelocity(self):
-        print ("(" + self.velocityX + ", " +self.velocityY, ")")
+        print("(" + self.velocityX + ", " + self.velocityY, ")")
 
     def displayAcceleration(self):
-        print ("(" + self.accelerationX + ", " + self.accelerationX, ")")
+        print("(" + self.accelerationX + ", " + self.accelerationX, ")")
 
     def updatePosition(self, time):
         self.positionX = self.positionX + self.velocityX * time
         self.positionY = self.positionY + self.velocityY * time
+
+    def turn(self, time):
+        if(self.direction == "vertical"):
+            self.positionX = self.positionX + self.velocityX * time
+            self.positionY = self.positionY + self.velocityY * time
+        elif(self.direction == "horizontal"):
+            self.positionX = self.positionX + self.velocityX * time
+            self.positionY = self.positionY + self.velocityY * time
 
     # Calculate velocity
     def updateVelocity(self, newPositionX, newPositionY):

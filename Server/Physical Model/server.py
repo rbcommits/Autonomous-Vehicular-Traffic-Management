@@ -42,29 +42,40 @@ def simulate(ID, msg):
     print("allocate worker object")
     worker = object()
 
+    '''
     print("server for loop")
     for workers in server_workers:
         print("workers.ID = ", workers.ID, "worker_ID = ", worker_ID)
         if worker_ID == workers.ID:
             worker = workers
+    '''
 
     # Create packet
     # msg = "Hello from worker " + str(worker.ID)
 
     # Send packet to car
     print("about to send message")
-    worker.worker.send_multipart([ID, msg])
-
+    #server_workers[0].send_multipart([ID, msg])
+    #worker.worker.send_multipart([ID, msg])
 
 def update_queue(myObj):
     print("UPDATED QUEUE")
-    values.gui.receiveCar(myObj)
-    values.gui.simulation.carList.append(myObj)
-    send_response(1) # send 1 as dummy velociity
-    
+
+    newObjFlag = True
+    for i in range(len(values.carList)):
+        if(myObj.ID == values.carList[i].ID):
+            newObjFlag = False
+
+    if(newObjFlag):
+        values.gui.receiveCar(myObj)
+        values.carList.append(myObj)
+
+    send_response(1)    # send 1 as dummy velociity
+
 def send_response(msg):
-    worker = object()
-    worker.worker.send_multipart([1, msg])
+    worker = server_workers[0]
+    #worker.worker.send_multipart([1, msg])
+
 
 def deserialize(msg):
     """inverse of send_zipped_packet"""

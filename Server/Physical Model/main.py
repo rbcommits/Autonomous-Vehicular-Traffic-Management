@@ -8,7 +8,7 @@ import _thread as thread
 import values
 import signal
 if __name__ == "__main__":
-	signal.signal(signal.SIGINT, signal.SIG_DFL)
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
     root = Tk()
     values.init(root)
     server = server.ServerTask()

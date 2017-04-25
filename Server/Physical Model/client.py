@@ -81,15 +81,13 @@ class ClientTask(threading.Thread):
 
 
 if __name__ == '__main__':
-#length, width, velocityX, velocityY, startX, startY, ID, direction, startTime
-#length=5, width=5, velocityX=velocity, velocityY=0, startX=0, startY=0, ID=ID, direction="vertical", startTime=time.time())
+    # length, width, velocityX, velocityY, startX, startY, ID, direction, startTime
+    # length=5, width=5, velocityX=velocity, velocityY=0, startX=0, startY=0, ID=ID, direction="vertical", startTime=time.time())
     car1 = Car(length=5, width=5, velocityX=1, velocityY=0, startX=0, startY=0, ID=2, direction="vertical", startTime=1)
     client1 = ClientTask(car1)
     client1.start()
 
-   
-
 
 def newCar(carObject):
     ClientTask(carObject).start()
-    #client.start()
+    # client.start()

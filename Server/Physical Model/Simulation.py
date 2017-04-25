@@ -11,13 +11,12 @@ from Intersection import Intersection
 # import server
 # import client
 
-# Initialize array to contain cars
-carList = values.carList
-
 
 def simulation(gui):
     # Initialize instance of intersection
     currIntersection = Intersection(length=40, wid=40, posX=490, posY=490, gui=gui)
+    values.carList.append(Car(length=5, width=5, velocityX=1, velocityY=0, startX=0, startY=490, ID=0, direction="horizontal", startTime=time.time()))
+    gui.drawCar(1, 0)
 
     elapsedTime = 0                                         # initialize time in seconds
     runSim = True                                           # bool to stop simulation
@@ -25,10 +24,8 @@ def simulation(gui):
     # Begin simulation:
     while(runSim):
 
-        print("Top of the loop")
-
         # Remove processed cars rom the intersection list
-        cleanList(carList, gui, currIntersection)
+        # cleanList(carList, gui, currIntersection)
 
         # Check to see if we should end simulation
         if(elapsedTime > values.simluationTime):
@@ -44,17 +41,16 @@ def simulation(gui):
 
         # Check if this is an optimized simulation
         else:
-            run_optimized(currIntersection, gui, carList)
+            run_optimized(currIntersection, gui, values.carList)
 
         # Update the positions of the cars
         update_positions(gui)
 
         # Sleep the while loop with custom spinlock.
         now = time.time()
-        while(time.time() - now <= (0.1)):
+        while(time.time() - now <= (0.01)):
             pass
 
-        print("Bottom of Loop")
     generate_statistics()
 
 
@@ -82,8 +78,8 @@ def run_conventional(intersection, gui):
 def update_intersection(intersection, elapsedTime):
         timeStart = time.time()         # START TIME
 
-        intersection.updateIntersectionQueues(carList, elapsedTime)
-        intersection.restoreVelocities(carList)
+        intersection.updateIntersectionQueues(values.carList, elapsedTime)
+        intersection.restoreVelocities(values.carList)
 
         timeEnd = time.time()           # END TIME
 
@@ -95,12 +91,12 @@ def update_positions(gui):
         timeStart = time.time()         # START TIME
 
         # Update the positions of the cars in the list
-        for i in range(0, len(carList)):
+        for i in range(0, len(values.carList)):
             # THIRD update position
-            carList[i].updatePosition(values.timeInterval)
+            values.carList[i].updatePosition(values.timeInterval)
 
         # Update GUI
-        gui.moveCars(carList, values.timeInterval)
+        gui.moveCars(values.carList, values.timeInterval)
 
         timeEnd = time.time()           # END TIME
 
@@ -116,7 +112,7 @@ def generate_cars(gui, elapsedTime):
                 # Generate two cars
                 for i in range(1, 3):
                     newCar = randomCarGenerator(gui, True, i)
-                    carList.append(newCar)
+                    values.carList.append(newCar)
 
         timeEnd = time.time()           # END TIME
 
@@ -243,18 +239,6 @@ def cleanList(carList, gui, currIntersection):
 
 
 def update_car_delay(time):
-    for i in range(0, len(carList)):
-        carList[i].calculationTime += time
+    for i in range(0, len(values.carList)):
+        values.carList[i].calculationTime += time
 
-
-def receiveCar(car):
-    print("RECEIVED CAR")
-    raw_input(car)
-    carList.append(car)
-    GUI.drawCar(car, car.ID)
-
-
-def printAllCars():
-    for i in range(0, len(carList)):
-        carList[i].displayCar()
-        input()

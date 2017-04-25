@@ -17,7 +17,7 @@ class carGUI:
         self.canv.pack(fill='both', expand=True)
 
         # Call Drawing functions
-        self.drawLanes()
+        self.drawLanes(4)
 
         # Create button to begin simulation
         b = Button(text="Start Simluation!", command=self.simClickListener)
@@ -35,8 +35,11 @@ class carGUI:
     def drawCar(self, lane, ID, dirNumber):
 
         # If this a horizontally travelling car draw it
-        if(lane == 1):
-            self.rect = self.canv.create_rectangle(0, 485, 10, 495, fill='black')
+        if(lane == 1 and dirNumber == 0):
+            self.rect = self.canv.create_rectangle(0, 195, 10, 205, fill='black')
+
+        elif(lane == 1 and dirNumber == 1):
+            self.rect = self.canv.create_rectangle(0, 495, 10, 505, fill='black')
 
         # This is a vertically travelling car in the first lane
         elif(lane == 2 and dirNumber == 0):
@@ -45,7 +48,6 @@ class carGUI:
         # This is a vertically travelling car in the second lane
         elif(lane == 2 and dirNumber == 1):
             self.rect = self.canv.create_rectangle(1015, 0, 1025, 10, fill='red')
-
 
         self.canv.addtag_below(self.rect, "HELLO")
 
@@ -56,19 +58,28 @@ class carGUI:
 
     def moveCars(self, carList, timeInterval):
 
-        self.master.update_idletasks()  # THIS UPDATES THE GUI
+        deleteList = []
 
-        for i in range(0, len(carList)):
+        # Fully remove the deleted car from the delete list
+        for i in range(len(deleteList)):
+            self.carIDs.remove(carList[i].ID)
+            tempCar = self.carDict.pop(carList[i].ID)
+            self.canv.delete(tempCar)
+
+        for i in range(len(carList)):
             self.canv.move(self.carDict[carList[i].ID], carList[i].velocityX * timeInterval, carList[i].velocityY * timeInterval)
+            if(carList[i].timeStamped is True):
+                # Place the car in the delete list for later deletion
+                carList[i].guiDeletedFlag = True
+                deleteList.append(carList[i])
 
     def moveCar(self, car, timeInterval):
-        self.master.update_idletasks()
+        # self.master.update_idletasks()
         self.canv.move(self.carDict[car.ID], car.velocityX * timeInterval, car.velocityY * timeInterval)
 
     def highlightCar(self, car, color):
         self.canv.itemconfig(self.carDict[car.ID], fill=color)
-        self.master.update_idletasks()
-
+        # self.master.update_idletasks()
 
     def simClickListener(self):
         from Simulation import simulation as sim
@@ -85,25 +96,49 @@ class carGUI:
         else:
             self.canv.itemconfig(self.carDisplayY, text=carData)
 
-    def drawLanes(self):
+    def drawLanes(self, size):
 
-        # Initialize X-Lane
-        self.xTop = self.canv.create_line(0, 470, 10000, 470, fill='black', tags=('top'))
-        self.xBottom = self.canv.create_line(0, 510, 10000, 510, fill='black', tags=('left'))
+        if(size == 1):
+            # Show Regulation Lines
+            self.xLimit = self.canv.create_line(470 - 40, 450, 470 - 40, 530, fill="red")
+            self.yLimit = self.canv.create_line(450, 470 - 40, 530, 470 - 40, fill="red")
 
-        # Initialize first Y-Lane
-        self.yLeft = self.canv.create_line(470, 0, 470, 10000, fill='blue', tags='right')
-        self.yRight = self.canv.create_line(510, 0, 510, 10000, fill='blue', tags='bottom')
+        elif(size == 2):
+            # Initialize first Y-Lane
+            self.yLeft = self.canv.create_line(470, 0, 470, 10000, fill='blue', tags='right')
+            self.yRight = self.canv.create_line(510, 0, 510, 10000, fill='blue', tags='bottom')
 
-        # Initialize second Y - Lane
-        self.yLeft = self.canv.create_line(1000, 0, 1000, 10000, fill='blue', tags='right')
-        self.yRight = self.canv.create_line(1040, 0, 1040, 10000, fill='blue', tags='bottom')
+            # Initialize second Y - Lane
+            self.yLeft = self.canv.create_line(1000, 0, 1000, 10000, fill='blue', tags='right')
+            self.yRight = self.canv.create_line(1040, 0, 1040, 10000, fill='blue', tags='bottom')
+
+        elif(size == 4):
+            # Initialize first X-Lane
+            self.xTop = self.canv.create_line(0, 180, 10000, 180, fill='black', tags=('top'))
+            self.xBottom = self.canv.create_line(0, 220, 10000, 220, fill='black', tags=('left'))
+
+            # Initialize second X-lane
+            self.xTop = self.canv.create_line(0, 480, 10000, 480, fill='black', tags='top')
+            self.xBottom = self.canv.create_line(0, 520, 10000, 520, fill='black', tags='top')
+
+            # Initialize first Y-Lane
+            self.yLeft = self.canv.create_line(470, 0, 470, 10000, fill='blue', tags='right')
+            self.yRight = self.canv.create_line(510, 0, 510, 10000, fill='blue', tags='bottom')
+
+            # Initialize second Y - Lane
+            self.yLeft = self.canv.create_line(1000, 0, 1000, 10000, fill='blue', tags='right')
+            self.yRight = self.canv.create_line(1040, 0, 1040, 10000, fill='blue', tags='bottom')
 
     def drawIndicationLines(self, Intersection):
 
         # Draw the entrance lines
         self.entranceX = self.canv.create_line(Intersection.positionX - Intersection.width, Intersection.positionY - Intersection.length, Intersection.positionX - Intersection.width, Intersection.positionY + Intersection.length, fill="red")
-        self.entranceX = self.canv.create_line(Intersection.positionX - Intersection.width, Intersection.positionY - Intersection.length, Intersection.positionX + Intersection.width, Intersection.positionY - Intersection.length, fill="red")
+        self.entranceY = self.canv.create_line(Intersection.positionX - Intersection.width, Intersection.positionY - Intersection.length, Intersection.positionX + Intersection.width, Intersection.positionY - Intersection.length, fill="red")
 
+        self.exitX = self.canv.create_line(Intersection.positionX + Intersection.width, Intersection.positionY + Intersection.length, Intersection.positionX + Intersection.width, Intersection.positionY - Intersection.length, fill="red")
+        self.exitY = self.canv.create_line(Intersection.positionX + Intersection.width, Intersection.positionY + Intersection.length, Intersection.positionX - Intersection.width, Intersection.positionY + Intersection.length, fill="red")
         # Paint the intersection
         self.rect = self.canv.create_rectangle(Intersection.positionX - Intersection.width / 2, Intersection.positionY - Intersection.length / 2, Intersection.positionX + Intersection.width / 2, Intersection.positionY + Intersection.length / 2, fill="green")
+
+    def update(self):
+        self.master.update_idletasks()

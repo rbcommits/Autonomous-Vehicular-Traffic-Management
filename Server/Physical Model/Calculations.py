@@ -17,6 +17,8 @@ def collisionDetection(queueX, queueY, gui, intersection, globalCarList):
         intersectionList.append(carX)
         intersectionList.append(carY)
 
+        print(intersectionList)
+        input()
 
         # Now determine which car entered the inersection first
         if(abs(carX.positionX) < abs(carY.positionY)):
@@ -47,13 +49,14 @@ def collisionDetection(queueX, queueY, gui, intersection, globalCarList):
     elif(not queueX.empty()):
         carX = queueX.get()
         intersectionList.append(carX)
+
         """ We must make sure the intersection is safe to fly through! """
         checkSafePassage(car=carX, intersection=intersection)
-
 
     elif(not queueY.empty()):
         carY = queueY.get()
         intersectionList.append(carY)
+
         """ We must make sure the intersection is safe to fly through! """
         checkSafePassage(car=carY, intersection=intersection)
 

@@ -2,17 +2,13 @@ from gui import carGUI
 # Here we declare global values that are used throughout
 # the interesection management module
 
-# Global carList container
-global carList
-carList = []
-
 
 # CAR VALUES
-maxVelocity = 1
+maxVelocity = .6
 
 # SIMULATION VALUES
 timeInterval = 1
-simluationTime = 10000000
+simluationTime = 100000000
 carGenerationModulo = 50
 
 # INTERSECTION VALUES
@@ -40,3 +36,5 @@ conventional_calculation_times = []		# Times a conventional vehicle spends in an
 def init(root):
     global gui
     gui = carGUI(root)
+    global carList
+    carList = []
