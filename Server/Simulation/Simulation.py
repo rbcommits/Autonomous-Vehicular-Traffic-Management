@@ -7,6 +7,7 @@ from gui import carGUI
 from random import randint
 from Car import Car
 from Intersection import Intersection
+import IntersectionThread
 # import server
 # import client
 
@@ -63,12 +64,26 @@ def simulation(gui):
             for i in range(len(IntersectionList)):
                 # thread.start_new_thread(run_conventional, (IntersectionList[i], gui))
                 run_conventional(IntersectionList[i], gui)
+                # interThread = IntersectionThread.interThread(IntersectionList[i],)
 
         # Check if this is an optimized simulation
         else:
+            interThreads = []
             for i in range(len(IntersectionList)):
-                # run_opt = thread.start_new_thread(run_optimized, (IntersectionList[i], gui, carList))
+                # run_opt = thread.__init__(run_optimized, (IntersectionList[i], gui, carList))
+                # run_opt.start()
+                # interThreads.append(run_opt)
+                # interThread = IntersectionThread.InterThread(IntersectionList[i], gui, carList)
+                # interThread.start()
+                # interThreads.append(interThread)
                 run_optimized(IntersectionList[i], gui, carList)
+
+            '''
+            for i in range(len(interThreads)):
+                interThreads[i].join()
+            '''
+
+            # interThreads.clear()
 
         # Update the positions of the cars
         update_positions(gui)
@@ -98,7 +113,7 @@ def run_optimized(intersection, gui, carList):
 
 def run_conventional(intersection, gui):
     timeStart = time.time()             # START TIME
-    Conventional.stopSign(intersection.queueX, intersection.queueY, gui)
+    Conventional.stopSign(intersection.queueX, intersection.queueY, gui, intersection)
 
     timeEnd = time.time()               # END TIME
 
@@ -109,7 +124,7 @@ def run_conventional(intersection, gui):
 def update_intersection(intersection, elapsedTime):
         timeStart = time.time()         # START TIME
 
-        intersection.updateIntersectionQueues(carList, elapsedTime)
+        intersection.updateIntersectionContainers(carList, elapsedTime)
         intersection.restoreVelocities(carList)
 
         timeEnd = time.time()           # END TIME
@@ -137,12 +152,14 @@ def update_positions(gui):
 def generate_cars(gui, elapsedTime):
         timeStart = time.time()         # START TIME
 
-        if(not values.conventionalStoppedX and not values.conventionalStoppedY):
+        if(True):       # not values.conventionalStoppedX and not values.conventionalStoppedY):
             if(elapsedTime % values.carGenerationModulo is 0):
                 # Generate two cars
                 for i in range(1, 3):
-                    newCar = randomCarGenerator(gui, True, i)
-                    carList.append(newCar)
+                    rand = randint(0, 3)
+                    if(rand == 0 or rand == 1 or rand == 2):
+                        newCar = randomCarGenerator(gui, True, i)
+                        carList.append(newCar)
 
         timeEnd = time.time()           # END TIME
 
@@ -176,10 +193,11 @@ def randomCarGenerator(LiveGUI, twoCars, Direction):
         LiveGUI.drawCar(direction, ID, dirNumber=0)
         carList.append(car)
 
-        # Generate a vertically travelling car in the second Y Lane    
+        # Generate a vertically travelling car in the second Y Lane
         ID = randomIDGenerator()
         car = Car(length=5, width=5, velocityX=0, velocityY=velocity, startX=IntersectionList[1].positionX, startY=0, ID=ID, direction="vertical", startTime=time.time())
         LiveGUI.drawCar(direction, ID, dirNumber=1)
+
 
     timeEnd = time.time()           # TIME END
 
@@ -265,11 +283,10 @@ def cleanList(carList, gui, currIntersection):
                 values.optimized_times.append(time.time() - carList[i].startTime - carList[i].calculationTime)
                 values.optimized_calculation_times.append(carList[i].calculationTime)
                 carList[i].timeStamped = True
-
-            if(carList[i].guiDeletedFlag is True):
                 deleteList.append(carList[i])
 
     for i in range(len(deleteList)):
+        gui.deleteCar(deleteList[i])
         carList.remove(deleteList[i])
 
 

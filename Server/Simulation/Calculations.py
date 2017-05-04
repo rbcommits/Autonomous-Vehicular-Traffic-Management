@@ -82,22 +82,19 @@ def slowCar(carSlow, carFull, slowY, intersection, gui):
     carSlow.regulationFlag = False
     carFull.regulationFlag = False
 
+
 """ Function to detect a possible collision """
+
+
 def collide(carX, carY, intersection, gui):
-    gui.highlightCar(carX, "green")
-    gui.highlightCar(carY, "green")
+    gui.highlightCar(carX, "red")
+    gui.highlightCar(carY, "red")
     # Create two copies of cars to test
     carTestX = copy.copy(carX)
     carTestY = copy.copy(carY)
 
-
-    # print(carTestX.getPosition())
-    # print(carTestY.getPosition())
-    # print("searching for good route")
-
     while(True):
-        # print(str(carTestX.positionX) + " <= " + str(carTestY.positionX + 1) + " and " + str(carTestX.positionX) + " >= " + str(carTestY.positionX - 1))
-        if(((carTestX.positionX <= carTestY.positionX + 10) and (carTestX.positionX >= carTestY.positionX - 10)) and 
+        if(((carTestX.positionX <= carTestY.positionX + 10) and (carTestX.positionX >= carTestY.positionX - 10)) and
             ((carTestX.positionY <= carTestY.positionY + 10) and (carTestX.positionY >= carTestY.positionY - 10))):
             return True
 
@@ -107,8 +104,6 @@ def collide(carX, carY, intersection, gui):
         carTestX.updatePosition(values.timeInterval)
         carTestY.updatePosition(values.timeInterval)
 
-        # if(((carTestX.positionX >= carTestY.positionX + 1) and (carTestX.positionX <= carTestY.positionX - 1)) or ((carTestX.positionY >= carTestY.positionY + 1) and (carTestX.positionY <= carTestY.positionY - 1))):
-
 
 def checkSafePassage(car, intersection, gui):
 
@@ -116,7 +111,7 @@ def checkSafePassage(car, intersection, gui):
         while(True):
             if(collisionSingle(car=car, intersection=intersection)):
                 car.velocityY = car.velocityY - 0.01
-                gui.highlightCar(car, "green")
+                gui.highlightCar(car, "red")
             else:
                 # print(values.deaccelerate(car.velocityY))
                 break
@@ -124,7 +119,7 @@ def checkSafePassage(car, intersection, gui):
         while(True):
             if(collisionSingle(car=car, intersection=intersection)):
                 car.velocityX = car.velocityX - 0.01
-                gui.highlightCar(car, "green")
+                gui.highlightCar(car, "red")
             else:
                 # print(values.deaccelerate(car.velocityX))
                 break

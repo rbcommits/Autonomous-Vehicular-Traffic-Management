@@ -10,7 +10,7 @@ maxDeacceleration = 0.5
 
 # SIMULATION VALUES
 timeInterval = 1
-simluationTime = 3000
+simluationTime = 300000000
 carGenerationModulo = 50
 
 # INTERSECTION VALUES
@@ -27,8 +27,6 @@ intersection2_posY = 490
 # CONVENTIONAL VALUES
 conventionalSimFlag = False
 conventional_stop_sign_wait = 3
-conventionalStoppedX = False
-conventionalStoppedY = False
 proceedVert = 0
 
 # STATISTICAL VALUES

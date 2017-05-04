@@ -23,7 +23,6 @@ class Car:
         the car up to maximum speed, otherwise it is untouchable. It is false by default """
         self.regulationFlag = False
         self.intersectionFlag = False
-        self.guiDeletedFlag = False
 
     # Print all details of car instance
     def displayCar(self):

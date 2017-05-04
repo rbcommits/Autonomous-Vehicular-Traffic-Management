@@ -8,37 +8,43 @@ queueDoneWaitingX = Queue.Queue()
 queueDoneWaitingY = Queue.Queue()
 
 
-def stopSign(queueX, queueY, gui):
+def stopSign(queueX, queueY, gui, intersection):
+
     if(not queueX.empty() and not queueY.empty()):
-        values.conventionalStoppedX = True
-        values.conventionalStoppedY = True
+        intersection.stoppedX = True
+        intersection.stoppedY = True
         carX = queueX.get()
         carY = queueY.get()
-        if(carX.positionX >= values.intersection_width / values.intersection_posX - (values.intersection_width / 2)):
+        intersection.IntersectionList.append(carX)
+        intersection.IntersectionList.append(carY)
+
+        if(carX.positionX >= intersection.positionX - (intersection.width / 2)):
             # STOP SIGN STOP THE CAR
-            thread.start_new_thread(wait, (carX,))
+            thread.start_new_thread(wait, (carX, intersection))
             carX.velocityX = values.maxVelocity
 
-        if(carY.positionY >= values.intersection_length / values.intersection_posY - (values.intersection_length / 2)):
+        if(carY.positionY >= intersection.positionY - (intersection.width / 2)):
             # STOP SIGN STOP THE CAR
-            thread.start_new_thread(wait, (carY,))
+            thread.start_new_thread(wait, (carY, intersection))
             carY.velocityY = values.maxVelocity
 
     elif(not queueX.empty()):
-        values.conventionalStoppedX = True
+        intersection.stoppedX = True
         carX = queueX.get()
-        thread.start_new_thread(wait, (carX,))
+        intersection.IntersectionList.append(carX)
+        thread.start_new_thread(wait, (carX, intersection))
 
     elif(not queueY.empty()):
-        values.conventionalStoppedY = True
+        intersection.stoppedY = True
         carY = queueY.get()
-        thread.start_new_thread(wait, (carY,))
+        intersection.IntersectionList.append(carY)
+        thread.start_new_thread(wait, (carY, intersection))
 
     # thread.start_new_thread(process_done_waiting, ())
-    process_done_waiting(gui, queueX, queueY)
+    process_done_waiting(gui, queueX, queueY, intersection)
 
 
-def wait(car):
+def wait(car, intersection):
     ts = time.time()
     car.waiting = True
     xCar = True
@@ -58,10 +64,10 @@ def wait(car):
 
             if(xCar):
                 queueDoneWaitingX.put(car)
-                values.conventionalStoppedX = False
+                intersection.stoppedX = False
             else:
                 queueDoneWaitingY.put(car)
-                values.conventionalStoppedY = False
+                intersection.stoppedY = False
 
             thread.exit()
             return
@@ -74,7 +80,7 @@ POISSON ARRIVAL TIMES
 '''
 
 
-def process_done_waiting(gui, queueX, queueY):
+def process_done_waiting(gui, queueX, queueY, intersection):
 
     if(not queueDoneWaitingX.empty() and not queueDoneWaitingY.empty()):
         # Fetch the cars from the done waiting queues
@@ -82,34 +88,32 @@ def process_done_waiting(gui, queueX, queueY):
         carX = queueDoneWaitingX.get()
         carY = queueDoneWaitingY.get()
 
-        if(values.proceedVert % 2 == 0):
-            values.proceedVert += 1
+        if(intersection.proceedVert % 2 == 0):
+            intersection.proceedVert += 1
 
             carX.velocityX = values.maxVelocity
-            # .conventionalStoppedX = False
-            # values.conventionalStoppedY = True
-            move_lane(carX, gui, queueX, queueY)
+
+            move_lane(carX, gui, queueX, queueY, intersection)
             print("We're asleep")
             # time.sleep(3)
             # carY.velocityY = values.maxVelocity
-            move_lane(carY, gui, queueX, queueY)
+            move_lane(carY, gui, queueX, queueY, intersection)
 
-            values.conventionalStoppedX = False
-            values.conventionalStoppedY = False
+            intersection.stoppedX = False
+            intersection.stoppedY = False
         else:
-            values.proceedVert += 1
+            intersection.proceedVert += 1
             carY.velocityY = values.maxVelocity
-            # values.conventionalStoppedX = True
-            # values.conventionalStoppedY = False
-            move_lane(carY, gui, queueX, queueY)
+
+            move_lane(carY, gui, queueX, queueY, intersection)
             print("We're asleep")
             # time.sleep(3)
             # carX.velocityX = values.maxVelocity
             carX.velocityX = values.maxVelocity
-            move_lane(carX, gui, queueX, queueY)
+            move_lane(carX, gui, queueX, queueY, intersection)
 
-            values.conventionalStoppedX = False
-            values.conventionalStoppedY = False
+            intersection.stoppedX = False
+            intersection.stoppedY = False
 
     elif(not queueDoneWaitingX.empty()):
         print("ELIF X NOT EMPTY")
@@ -117,30 +121,26 @@ def process_done_waiting(gui, queueX, queueY):
 
         carX = queueDoneWaitingX.get()
         carX.velocityX = values.maxVelocity
-        move_lane(carX, gui, queueX, queueY)
+        move_lane(carX, gui, queueX, queueY, intersection)
 
-        values.conventionalStoppedX = False
+        intersection.stoppedX = False
 
     elif(not queueDoneWaitingY.empty()):
         print("ELIF Y NOT EMPTY")
-        print("STOPPEDX = " + str(values.conventionalStoppedX) + " STOPPED Y = " + str(values.conventionalStoppedY))
-        # time.sleep(1)
-
         carY = queueDoneWaitingY.get()
         carY.velocityY = values.maxVelocity
-        move_lane(carY, gui, queueX, queueY)
+        move_lane(carY, gui, queueX, queueY, intersection)
 
-        values.conventionalStoppedY = False
+        intersection.stoppedY = False
 
     return
 
-def move_lane(car, gui, queueX, queueY):
+
+def move_lane(car, gui, queueX, queueY, intersection):
 
     curr_time = time.time()
 
-    while(time.time() - curr_time <= 1.4):
-        print("SPECIAL MOVE")
-
+    while(time.time() - curr_time <= 3):
         # stopSign(queueX, queueY, gui)
         timeStart = time.time()             # TIME START
 
@@ -148,14 +148,15 @@ def move_lane(car, gui, queueX, queueY):
         for i in range(0, len(Simulation.carList)):
             if(Simulation.carList[i].ID != car.ID):
 
-                if((Simulation.carList[i].positionX >= values.intersection_width + values.intersection_posX) / 1.11):
+                if((Simulation.carList[i].positionX >= intersection.width / 4 + intersection.positionX)):
+                    print(" past intersection")
                     Simulation.carList[i].updatePosition(values.timeInterval)
                     gui.moveCar(Simulation.carList[i], values.timeInterval)
 
                     gui.highlightCar(Simulation.carList[i], "yellow")
                     gui.updateCarInformationDisplay(Simulation.carList[i])
 
-                elif(Simulation.carList[i].positionY >= (values.intersection_length + values.intersection_posY) / 1.11):
+                elif(Simulation.carList[i].positionY >= (intersection.length / 4 + intersection.positionY)):
                     Simulation.carList[i].updatePosition(values.timeInterval)
                     gui.moveCar(Simulation.carList[i], values.timeInterval)
 

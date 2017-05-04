@@ -2,7 +2,6 @@
 from tkinter import Canvas, Button, Checkbutton, IntVar
 import values
 
-
 class carGUI:
 
     carDict = {}
@@ -10,7 +9,7 @@ class carGUI:
 
     def __init__(self, master):
         self.master = master
-        master.title("A simple GUI")
+        master.title("Intersection Management GUI")
 
         # Initialize Canvas
         self.canv = Canvas(master)
@@ -43,11 +42,11 @@ class carGUI:
 
         # This is a vertically travelling car in the first lane
         elif(lane == 2 and dirNumber == 0):
-            self.rect = self.canv.create_rectangle(485, 0, 495, 10, fill='red')
+            self.rect = self.canv.create_rectangle(485, 0, 495, 10, fill='black')
 
         # This is a vertically travelling car in the second lane
         elif(lane == 2 and dirNumber == 1):
-            self.rect = self.canv.create_rectangle(1015, 0, 1025, 10, fill='red')
+            self.rect = self.canv.create_rectangle(1015, 0, 1025, 10, fill='black')
 
         self.canv.addtag_below(self.rect, "HELLO")
 
@@ -57,35 +56,29 @@ class carGUI:
         self.carDict[ID] = self.rect
 
     def moveCars(self, carList, timeInterval):
-
-        deleteList = []
-
-        # Fully remove the deleted car from the delete list
-        for i in range(len(deleteList)):
-            self.carIDs.remove(carList[i].ID)
-            tempCar = self.carDict.pop(carList[i].ID)
-            self.canv.delete(tempCar)
-
         for i in range(len(carList)):
             self.canv.move(self.carDict[carList[i].ID], carList[i].velocityX * timeInterval, carList[i].velocityY * timeInterval)
-            if(carList[i].timeStamped is True):
-                # Place the car in the delete list for later deletion
-                carList[i].guiDeletedFlag = True
-                deleteList.append(carList[i])
+
+    def deleteCar(self, car):
+        self.carIDs.remove(car.ID)
+        tempCar = self.carDict.pop(car.ID)
+        self.canv.delete(tempCar)
+        self.master.update_idletasks()
 
     def moveCar(self, car, timeInterval):
-        # self.master.update_idletasks()
+        self.master.update_idletasks()
         self.canv.move(self.carDict[car.ID], car.velocityX * timeInterval, car.velocityY * timeInterval)
 
     def highlightCar(self, car, color):
         self.canv.itemconfig(self.carDict[car.ID], fill=color)
-        # self.master.update_idletasks()
+        self.master.update_idletasks()
 
     def simClickListener(self):
         from Simulation import simulation as sim
         sim(self)
 
     def updateCarInformationDisplay(self, car):
+        '''
         carData = "position X = " + str(car.positionX) + "\nposition Y = " + \
             str(car.positionY) + "\nvelocity X = " + str(car.velocityX) + \
             "\nvelocity Y = " + str(car.velocityY)
@@ -95,6 +88,8 @@ class carGUI:
 
         else:
             self.canv.itemconfig(self.carDisplayY, text=carData)
+        '''
+        pass
 
     def drawLanes(self, size):
 

@@ -17,6 +17,9 @@ def simulation(gui):
     currIntersection = Intersection(length=40, wid=40, posX=490, posY=490, gui=gui)
     values.carList.append(Car(length=5, width=5, velocityX=1, velocityY=0, startX=0, startY=490, ID=0, direction="horizontal", startTime=time.time()))
     gui.drawCar(1, 0)
+    values.carList.append(Car(length=5, width=5, velocityX=0, velocityY=1, startX=490, startY=0, ID=111, direction="vertical", startTime=time.time()))
+    gui.drawCar(2, 111)
+
 
     elapsedTime = 0                                         # initialize time in seconds
     runSim = True                                           # bool to stop simulation
