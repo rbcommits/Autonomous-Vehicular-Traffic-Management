@@ -16,12 +16,15 @@ class Intersection:
         self.IntersectionList = []
         self.gui = gui
         self.ID = random.randint(0, 1000)
+        self.stoppedX = False
+        self.stoppedY = False
+        self.proceedVert = 0
 
-    def updateIntersectionQueues(self, carList, time):
+    def updateIntersectionContainers(self, carList, time):
         ''' Iterate through the list of all cars in the intersection radius '''
         for i in range(0, len(carList)):
             ''' If the car is within the inner radius then it must me marked to be regulated '''
-            if(carList[i].positionX >= self.positionX - self.width * 8 and carList[i].positionX <= self.positionX and 
+            if(carList[i].positionX >= self.positionX - self.width * 2 and carList[i].positionX <= self.positionX and 
                 carList[i].direction == "horizontal" and carList[i].positionY >= self.positionY - self.length and
                 carList[i].positionY <= self.positionY + self.length):
 
@@ -33,7 +36,7 @@ class Intersection:
                     carList[i].intersectionTimeStamp = time   # Stamp the arrival time
                     self.queueX.put(carList[i])               # Place car in queue to be regulated
 
-            if(carList[i].positionY >= self.positionY - self.length * 8 and carList[i].positionY <= self.positionY and
+            if(carList[i].positionY >= self.positionY - self.length * 2 and carList[i].positionY <= self.positionY and
              carList[i].direction == "vertical" and carList[i].positionX >= self.positionX - self.width and
               carList[i].positionX <= self.positionX + self.width):
 
@@ -49,38 +52,55 @@ class Intersection:
 
         removeList = []
 
-        if self.IntersectionList:
+        if self.IntersectionList and values.conventionalSimFlag is False:
             for i in range(0, len(self.IntersectionList)):
-                if(self.IntersectionList[i].positionX > self.positionX + self.width / 4 and self.IntersectionList[i].direction == "horizontal" and self.IntersectionList[i].regulationFlag is False):
+                if(self.IntersectionList[i].positionX > self.positionX + self.width / 2 and self.IntersectionList[i].direction == "horizontal" and self.IntersectionList[i].regulationFlag is False):
                     self.IntersectionList[i].velocityX = values.maxVelocity
                     self.IntersectionList[i].intersectionFlag = False
                     self.IntersectionList[i].inQueue = False
                     self.gui.highlightCar(self.IntersectionList[i], "black")
                     removeList.append(self.IntersectionList[i])
 
-                elif(self.IntersectionList[i].positionY > self.positionY + self.length / 4 and self.IntersectionList[i].direction == "vertical" and self.IntersectionList[i].regulationFlag is False):
+                elif(self.IntersectionList[i].positionY > self.positionY + self.length / 2 and self.IntersectionList[i].direction == "vertical" and self.IntersectionList[i].regulationFlag is False):
                     self.IntersectionList[i].velocityY = values.maxVelocity
                     self.IntersectionList[i].intersectionFlag = False
                     self.IntersectionList[i].inQueue = False
-                    self.gui.highlightCar(self.IntersectionList[i], "red")
+                    self.gui.highlightCar(self.IntersectionList[i], "black")
                     removeList.append(self.IntersectionList[i])
-            for i in range(len(removeList)):
-                self.IntersectionList.remove(removeList[i])
 
-            removeList.clear()
+        elif self.IntersectionList and values.conventionalSimFlag is True:
+            for i in range(len(self.IntersectionList)):
 
-        elif(values.conventionalSimFlag and carList[i].positionX < self.positionX and values.conventionalStoppedX and carList[i].velocityX > 0):
-                print("X CAR IS STOPPED")
-                carList[i].velocityX = 0
-        elif(values.conventionalSimFlag and carList[i].positionY < self.positionY and values.conventionalStoppedY and carList[i].velocityY > 0):
-                print("Y CAR IS STOPPED")
-                carList[i].velocityY = 0
+                if(values.conventionalSimFlag and self.IntersectionList[i].positionX < self.positionX and self.stoppedX and self.IntersectionList[i].velocityX > 0):
+                        print("X CAR IS STOPPED")
+                        self.IntersectionList[i].velocityX = 0
+                elif(values.conventionalSimFlag and self.IntersectionList[i].positionY < self.positionY and self.stoppedY and self.IntersectionList[i].velocityY > 0):
+                        print("Y CAR IS STOPPED")
+                        self.IntersectionList[i].velocityY = 0
 
-        elif(values.conventionalSimFlag and carList[i].direction is "vertical" and carList[i].positionX < self.positionX and not values.conventionalStoppedX):
-                carList[i].velocityX = values.maxVelocity
+                elif(values.conventionalSimFlag and self.IntersectionList[i].direction == "vertical" and self.IntersectionList[i].positionX > self.positionX):      # and not self.stoppedX):
+                        print("DANIEL ")
+                        self.IntersectionList[i].velocityX = values.maxVelocity
+                        self.IntersectionList[i].intersectionFlag = False
+                        self.IntersectionList[i].inQueue = False
+                        self.gui.highlightCar(self.IntersectionList[i], "red")
+                        removeList.append(self.IntersectionList[i])
 
-        elif(values.conventionalSimFlag and carList[i].direction is "horizontal" and carList[i].positionY < self.positionY and not values.conventionalStoppedY):
-                carList[i].velocityY = values.maxVelocity
+                elif(values.conventionalSimFlag and self.IntersectionList[i].direction == "horizontal" and self.IntersectionList[i].positionY > self.positionY):        # and not self.stoppedY):
+                        print("DANIEL HAS TO ")
+                        self.IntersectionList[i].velocityY = values.maxVelocity
+                        self.IntersectionList[i].intersectionFlag = False
+                        self.IntersectionList[i].inQueue = False
+                        self.gui.highlightCar(self.IntersectionList[i], "black")
+                        removeList.append(self.IntersectionList[i])
+                else:
+                    if(values.conventionalSimFlag):
+                        print("nothing caught it")
+
+        for i in range(len(removeList)):
+            self.IntersectionList.remove(removeList[i])
+
+        removeList.clear()
 
     def printIntersectionDetails(self):
         print("Center Point = (" + str(self.positionX) + ", " + str(self.positionY) + ")")

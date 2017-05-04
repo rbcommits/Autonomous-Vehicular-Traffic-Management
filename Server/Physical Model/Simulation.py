@@ -15,11 +15,7 @@ from Intersection import Intersection
 def simulation(gui):
     # Initialize instance of intersection
     currIntersection = Intersection(length=40, wid=40, posX=490, posY=490, gui=gui)
-    values.carList.append(Car(length=5, width=5, velocityX=1, velocityY=0, startX=0, startY=490, ID=0, direction="horizontal", startTime=time.time()))
-    gui.drawCar(1, 0)
-    values.carList.append(Car(length=5, width=5, velocityX=0, velocityY=1, startX=490, startY=0, ID=111, direction="vertical", startTime=time.time()))
-    gui.drawCar(2, 111)
-
+    generate_physical_test_cars(gui)
 
     elapsedTime = 0                                         # initialize time in seconds
     runSim = True                                           # bool to stop simulation
@@ -81,7 +77,7 @@ def run_conventional(intersection, gui):
 def update_intersection(intersection, elapsedTime):
         timeStart = time.time()         # START TIME
 
-        intersection.updateIntersectionQueues(values.carList, elapsedTime)
+        intersection.updateIntersectionContainers(values.carList, elapsedTime)
         intersection.restoreVelocities(values.carList)
 
         timeEnd = time.time()           # END TIME
@@ -245,3 +241,9 @@ def update_car_delay(time):
     for i in range(0, len(values.carList)):
         values.carList[i].calculationTime += time
 
+def generate_physical_test_cars(gui):
+    time.sleep(3)
+    values.carList.append(Car(length=5, width=5, velocityX=1, velocityY=0, startX=0, startY=490, ID=0, direction="horizontal", startTime=time.time()))
+    gui.drawCar(1, 0)
+    values.carList.append(Car(length=5, width=5, velocityX=0, velocityY=1, startX=490, startY=0, ID=111, direction="vertical", startTime=time.time()))
+    gui.drawCar(2, 111)

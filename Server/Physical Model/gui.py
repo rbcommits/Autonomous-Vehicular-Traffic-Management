@@ -63,7 +63,7 @@ class carGUI:
             self.rect = self.canv.create_rectangle(0, 485, 10, 495, fill='black')
         elif(lane == 2):
             # Draw a Y car
-            self.rect = self.canv.create_rectangle(485, 0, 495, 10, fill='red')
+            self.rect = self.canv.create_rectangle(485, 0, 495, 10, fill='black')
 
         self.canv.addtag_below(self.rect, "HELLO")
 
